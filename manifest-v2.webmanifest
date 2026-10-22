@@ -1,0 +1,32 @@
+{
+  "name": "Paint Project Manager V3.6",
+  "short_name": "Paint Manager",
+  "description": "Paint project estimating and order workflow manager.",
+  "id": "./?app=paint-project-manager-v36",
+  "start_url": "./index.html?release=v36-icon-v2",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#08090b",
+  "theme_color": "#8f3f1f",
+  "icons": [
+    {
+      "src": "./ppm-logo-192-v2.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./ppm-logo-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./ppm-logo-512-v2.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
