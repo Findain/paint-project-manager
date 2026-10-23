@@ -9673,4 +9673,127 @@ body[data-app-view="home"] #settingsUpdateAlert.update-ready{
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
 </script>
+
+<style id="v36-rev-f-contrast-focused-workflow-style">
+/* Rev F contrast standard: dark surfaces always use bright text. */
+body:not([data-app-view="home"]) .card,
+body:not([data-app-view="home"]) .area,
+body:not([data-app-view="home"]) .pcard,
+body:not([data-app-view="home"]) .order-card,
+body:not([data-app-view="home"]) .modalbox,
+body:not([data-app-view="home"]) .settings-panel,
+body:not([data-app-view="home"]) .scope-group,
+body:not([data-app-view="home"]) .workflow-toolbar,
+body:not([data-app-view="home"]) .manual-shopping-editor{color:#fff!important}
+body:not([data-app-view="home"]) .card label,
+body:not([data-app-view="home"]) .card p,
+body:not([data-app-view="home"]) .card span,
+body:not([data-app-view="home"]) .card small,
+body:not([data-app-view="home"]) .area label,
+body:not([data-app-view="home"]) .area p,
+body:not([data-app-view="home"]) .area span,
+body:not([data-app-view="home"]) .area small,
+body:not([data-app-view="home"]) .settings-panel label,
+body:not([data-app-view="home"]) .settings-panel p,
+body:not([data-app-view="home"]) .settings-panel span,
+body:not([data-app-view="home"]) .settings-panel small,
+body:not([data-app-view="home"]) .workflow-toolbar span,
+body:not([data-app-view="home"]) .activity-meta,
+body:not([data-app-view="home"]) .muted{color:#ffe8d2!important}
+body:not([data-app-view="home"]) .ghost,
+body:not([data-app-view="home"]) .light,
+body:not([data-app-view="home"]) .secondary,
+body:not([data-app-view="home"]) button[style*="background"],
+body:not([data-app-view="home"]) #undoLastChange{color:#fff!important}
+body:not([data-app-view="home"]) input,
+body:not([data-app-view="home"]) select,
+body:not([data-app-view="home"]) textarea{color:#fff!important}
+body:not([data-app-view="home"]) input::placeholder,
+body:not([data-app-view="home"]) textarea::placeholder{color:#ffd4b0!important;opacity:1!important}
+/* One scope at a time. Shopping List, totals, and project identity stay active. */
+#edit[data-focused-scope="interior"] #exteriorGroup,
+#edit[data-focused-scope="interior"] #stainSection,
+#edit[data-focused-scope="exterior"] #interiorGroup,
+#edit[data-focused-scope="exterior"] #stainSection,
+#edit[data-focused-scope="stain"] #interiorGroup,
+#edit[data-focused-scope="stain"] #exteriorGroup{display:none!important}
+#edit[data-focused-scope="interior"] #interiorGroup,
+#edit[data-focused-scope="exterior"] #exteriorGroup,
+#edit[data-focused-scope="stain"] #stainSection{display:block!important}
+.scope-checks .scope-tile{color:#fff!important}
+.scope-checks .scope-tile.rev-f-active-scope{outline:3px solid #ff9a45!important;outline-offset:2px!important;box-shadow:inset 5px 0 0 #ff7416,0 5px 18px #0007!important}
+</style>
+<script id="v36-rev-f-contrast-focused-workflow-script">
+(()=>{
+ 'use strict';
+ const scopes={scopeInterior:{mode:'interior',target:'interiorGroup',button:'addInteriorArea',label:'+ Add Interior Location'},scopeExterior:{mode:'exterior',target:'exteriorGroup',button:'addExteriorArea',label:'+ Add Elevation'},scopeStain:{mode:'stain',target:'stainSection',button:'addStainArea',label:'+ Add Stain Location'}};
+ function relabelAddButtons(){
+   Object.values(scopes).forEach(config=>{const button=document.getElementById(config.button);if(button)button.textContent=config.label;});
+ }
+ function focusScope(inputId,scroll=true){
+   const config=scopes[inputId],edit=document.getElementById('edit');
+   if(!config||!edit)return;
+   const input=document.getElementById(inputId);
+   if(input&&!input.checked){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}
+   edit.dataset.focusedScope=config.mode;
+   document.querySelectorAll('.scope-checks .scope-tile').forEach(tile=>tile.classList.toggle('rev-f-active-scope',tile.dataset.scopeTile===inputId));
+   Object.values(scopes).forEach(item=>{const section=document.getElementById(item.target);if(section)section.style.display=item.mode===config.mode?'block':'none';});
+   const target=document.getElementById(config.target);
+   if(target){target.classList.remove('hide');if(scroll)requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}));}
+   relabelAddButtons();
+ }
+ function captureScopeSelection(event){
+   const tile=event.target.closest?.('.scope-checks .scope-tile[data-scope-tile]');
+   if(!tile)return;
+   const input=tile.querySelector('input');if(!input||!scopes[input.id])return;
+   event.preventDefault();event.stopImmediatePropagation();focusScope(input.id,true);
+ }
+ function prepare(){
+   relabelAddButtons();
+   document.addEventListener('click',captureScopeSelection,true);
+   document.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')return;captureScopeSelection(event);},true);
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepare,{once:true});else prepare();
+})();
+</script>
+
+<style id="v36-rev-g-add-work-area-style">
+/* Selector mode hides workflow sections but preserves their data and the shared shopping list. */
+#edit[data-focused-scope="selector"] #interiorGroup,
+#edit[data-focused-scope="selector"] #exteriorGroup,
+#edit[data-focused-scope="selector"] #stainSection{display:none!important}
+.add-work-area-nav{display:flex!important;justify-content:flex-end!important;margin:0 0 12px!important;padding:0!important}
+.add-work-area-nav .btn{min-height:44px!important;background:#3a2417!important;color:#fff!important;border:2px solid #ff8a31!important;font-weight:900!important}
+.add-work-area-nav .btn:hover,.add-work-area-nav .btn:focus-visible{background:#ff7416!important;color:#fff!important;outline:3px solid #ffd2ad!important;outline-offset:2px!important}
+.scope-selector-return-note{display:none;margin:8px 0 0;padding:9px 11px;border-radius:10px;background:#3a2417;color:#fff;font-weight:850}
+#edit[data-focused-scope="selector"] .scope-selector-return-note{display:block}
+</style>
+<script id="v36-rev-g-add-work-area-script">
+(()=>{
+ 'use strict';
+ const sections=['interiorGroup','exteriorGroup','stainSection'];
+ function selector(){return document.querySelector('#edit .scope-checks');}
+ function showScopeSelector(){
+   const edit=document.getElementById('edit');if(!edit)return;
+   edit.dataset.focusedScope='selector';
+   sections.forEach(id=>{const section=document.getElementById(id);if(section)section.style.display='none';});
+   document.querySelectorAll('.scope-checks .scope-tile').forEach(tile=>tile.classList.remove('rev-f-active-scope','focused-scope-link'));
+   const target=selector();
+   if(target){target.scrollIntoView({behavior:'smooth',block:'center'});const first=target.querySelector('.scope-tile');setTimeout(()=>first?.focus(),300);}
+ }
+ function install(){
+   const labels={interiorGroup:'Interior',exteriorGroup:'Exterior Paint',stainSection:'Exterior Stain'};
+   sections.forEach(id=>{
+     const section=document.getElementById(id);if(!section||section.querySelector('.add-work-area-nav'))return;
+     const anchor=section.querySelector('.scope-body')||section;
+     anchor.insertAdjacentHTML('afterbegin',`<div class="add-work-area-nav"><button type="button" class="btn" data-add-work-area aria-label="Add another work area to this project">+ Add Another Work Area</button></div>`);
+   });
+   const checks=selector();
+   if(checks&&!document.querySelector('.scope-selector-return-note'))checks.insertAdjacentHTML('afterend','<p class="scope-selector-return-note">Choose Interior, Exterior Paint, or Exterior Stain. Existing work and the Shopping List stay with this project.</p>');
+ }
+ document.addEventListener('click',event=>{const button=event.target.closest?.('[data-add-work-area]');if(!button)return;event.preventDefault();event.stopImmediatePropagation();showScopeSelector();},true);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+ new MutationObserver(install).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
 </body></html>
