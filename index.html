@@ -9374,7 +9374,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
         const finishes=ORDER_CATALOG[quickPick.category][quickPick.product];if(!finishes.includes(quickPick.finish))quickPick.finish=finishes[0];
         const walks=[...db].filter(project=>hasProjectIdentity(project));let selectedWalkId='';
         openIntegrationModal('Quick Order',`<div id="qoValidationError" class="quick-validation-error hide"></div><div class="quick-identity"><label>Customer / Pro Name <b>*</b><input id="qoCustomer" autocomplete="name"></label><label>Phone Number <b>*</b><input id="qoPhone" type="tel" autocomplete="tel"></label></div><div class="walk-search-box"><label>Link Existing Walk <small>Optional</small><input id="qoWalkSearch" placeholder="Start typing owner, contractor, address, city, ZIP, or phone..."></label><button type="button" class="btn ghost hide" id="qoClearWalk">Clear Link</button><div id="qoWalkSelected" class="walk-selected hide"></div><div id="qoWalkResults" class="walk-search-results hide"></div></div><p class="quick-walk-note">Linking is optional. Select a matching walk to categorize this Quick Order under that house, or leave the search blank for a standalone Quick Order.</p><label class="quick-label">Category</label>${tileGroup('qoCategoryTiles',categories,'category')}<label class="quick-label">Product</label>${tileGroup('qoProductTiles',products,'product')}<label class="quick-label">Finish / Sheen / Opacity</label>${tileGroup('qoFinishTiles',finishes,'finish')}<label class="quick-label">Container</label>${tileGroup('qoContainerTiles',['Single Gallon','5-Gallon Pail'],'container')}<label class="quick-label">Quantity</label>${tileGroup('qoQtyTiles',[1,2,3,4,5,10,'Custom'],'qty')}<input id="qoCustomQty" class="field ${quickPick.qty==='Custom'?'':'hide'}" type="number" min="1" value="1"><div class="quick-identity quick-details"><label>Color Name / Number<input id="qoColor"></label><label>Order Note / Area<input id="qoNotes" placeholder="Primer, cabinet paint, patched wall..."></label></div><div id="qoDraftLines" class="quick-multi-lines"></div><button type="button" class="btn secondary order-primary-action" id="addQuickColorLine">+ Add Another Color</button><button class="btn primary order-primary-action" id="addQuickToCart">Add Quick Order to Active Cart</button>`);
-        const renderWalkResults=term=>{const box=$('#qoWalkResults'),q=String(term||'').trim().toLowerCase(),digits=q.replace(/\D/g,'');if(!q){box.classList.add('hide');box.innerHTML='';return}const found=walks.filter(p=>[p.customer,p.address,p.city,p.state,p.zip,p.phone].some(v=>String(v||'').toLowerCase().includes(q))||(digits&&String(p.phone||'').replace(/\D/g,'').includes(digits))).slice(0,12);box.innerHTML=found.length?found.map(p=>`<button type="button" class="walk-search-result" data-walk-id="${integrationEsc(p.id)}"><b>${integrationEsc(p.customer||'Untitled')}</b><span>${integrationEsc(p.address||'')} ${integrationEsc(p.city||'')} ${integrationEsc(p.zip||'')}</span><small>${integrationEsc(p.phone||'')}</small></button>`).join(''):'<p>No matching walks.</p>';box.classList.remove('hide')};
+        const renderWalkResults=term=>{const box=$('#qoWalkResults'),q=String(term||'').trim().toLowerCase(),tokens=q.split(/\s+/).filter(Boolean);if(!q){box.classList.add('hide');box.innerHTML='';return}const searchableValue=value=>{if(value==null)return '';if(Array.isArray(value))return value.map(searchableValue).join(' ');if(typeof value==='object')return Object.values(value).map(searchableValue).join(' ');return String(value)};const found=walks.filter(p=>{const haystack=searchableValue(p).toLowerCase(),phoneDigits=String(p.phone||'').replace(/\D/g,'');return tokens.every(token=>{const tokenDigits=token.replace(/\D/g,'');return haystack.includes(token)||(tokenDigits.length>=3&&phoneDigits.includes(tokenDigits))})}).slice(0,12);box.innerHTML=found.length?found.map(p=>`<button type="button" class="walk-search-result" data-walk-id="${integrationEsc(p.id)}"><b>${integrationEsc(p.customer||'Untitled')}</b><span>${integrationEsc(p.address||'')} ${integrationEsc(p.city||'')} ${integrationEsc(p.zip||'')}</span><small>${integrationEsc(p.phone||'')}</small></button>`).join(''):'<p>No matching walks.</p>';box.classList.remove('hide')};
         $('#qoWalkSearch').oninput=e=>renderWalkResults(e.target.value);
         $('#qoWalkResults').onclick=e=>{const result=e.target.closest('[data-walk-id]');if(!result)return;const linked=walks.find(p=>String(p.id)===result.dataset.walkId);if(!linked)return;selectedWalkId=String(linked.id);$('#qoCustomer').value=linked.customer||'';$('#qoPhone').value=linked.phone||'';$('#qoWalkSelected').innerHTML=`<b>${integrationEsc(linked.customer||'Untitled')}</b><span>${integrationEsc(linked.address||'')} ${integrationEsc(linked.city||'')}</span><small>Linked walk</small>`;$('#qoWalkSelected').classList.remove('hide');$('#qoClearWalk').classList.remove('hide');$('#qoWalkResults').classList.add('hide');$('#qoWalkSearch').value='';$('#qoCustomer').classList.remove('required-missing');$('#qoPhone').classList.remove('required-missing')};
         $('#qoClearWalk').onclick=()=>{selectedWalkId='';$('#qoWalkSelected').classList.add('hide');$('#qoWalkSelected').innerHTML='';$('#qoClearWalk').classList.add('hide');$('#qoWalkSearch').value='';$('#qoWalkSearch').focus()};
@@ -11309,6 +11309,38 @@ html body #integrationModal #qoDraftLines [data-remove-quick-line]:disabled{
   border-color:#6d3b24!important;
   color:#fff!important;
   -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+</style>
+
+<style id="v38-rev-aa-live-filter-final-contrast">
+/* V3.8 Rev AA: Quick Order live-filter field is dark and must always use light text. */
+html body #integrationModal #qoWalkSearch,
+html body #integrationModal #qoWalkSearch:hover,
+html body #integrationModal #qoWalkSearch:focus,
+html body #integrationModal #qoWalkSearch:focus-visible,
+html body #integrationModal #qoWalkSearch:active{
+  background:#111317!important;
+  border-color:#d18a48!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  caret-color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+html body #integrationModal #qoWalkSearch::placeholder{
+  color:#f4dfc3!important;
+  -webkit-text-fill-color:#f4dfc3!important;
+  opacity:1!important;
+}
+/* Search-result cards remain light surfaces with dark readable text. */
+html body #integrationModal #qoWalkResults,
+html body #integrationModal #qoWalkResults p,
+html body #integrationModal #qoWalkResults .walk-search-result,
+html body #integrationModal #qoWalkResults .walk-search-result *{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
   opacity:1!important;
   text-shadow:none!important;
 }
