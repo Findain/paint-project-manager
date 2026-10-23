@@ -9279,20 +9279,31 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
     function openActiveOrderEditor(orderId){
         const order=orderState.active.find(item=>item.id===orderId);
         if(!order)return toast('Active Cart order not found');
-        order.lines=(order.lines||[]).map(normalizeEditableOrderLine);
-        const renderEditor=()=>{
-            openIntegrationModal(`Edit Active Cart · Order #${order.number}`,`<p class="active-edit-note">This is the final QA checkpoint. Make all product, finish, color, quantity, and note changes before submitting to Waiting for Mix.</p><div id="activeOrderEditLines">${order.lines.map(activeOrderEditorLine).join('')}</div><div class="active-editor-actions"><button type="button" class="btn secondary" id="addActiveOrderLine">+ Add Line</button><button type="button" class="btn primary" id="saveActiveOrderChanges">Save Changes</button></div>`);
-            const modal=$('#integrationModal');
-            modal.querySelectorAll('[data-active-delete-line]').forEach(button=>button.onclick=()=>{if(order.lines.length<=1)return toast('An order needs at least one line');order.lines.splice(+button.dataset.activeDeleteLine,1);renderEditor()});
-            $('#addActiveOrderLine').onclick=()=>{order.lines.push(normalizeEditableOrderLine({product:'',finish:'',color:'',qty:1,notes:''}));renderEditor()};
-            $('#saveActiveOrderChanges').onclick=()=>{
-                const cards=[...modal.querySelectorAll('[data-active-edit-line]')];
-                const next=cards.map(card=>{const get=field=>card.querySelector(`[data-active-line-field="${field}"]`)?.value.trim()||'';const qty=Math.max(1,parseInt(get('qty'),10)||1);const product=get('product');const finish=get('finish');const color=get('color');const notes=get('notes');return {id:order.lines[+card.dataset.activeEditLine]?.id||`L${Date.now()}${card.dataset.activeEditLine}`,product,finish,color,qty,notes,title:product,detail:[finish,color,notes].filter(Boolean).join(' · ')}});
-                if(next.some(line=>!line.product))return toast('Enter a product for every line');
-                order.lines=next;saveOrderState();modal.remove();toast('Active Cart changes saved');
-            };
+        const original=normalizeEditableOrderLine((order.lines||[])[0]||{});
+        let pick={category:Object.keys(ORDER_CATALOG)[0],product:'',finish:'',container:/5-Gallon/i.test(original.detail)?'5-Gallon Pail':'Single Gallon',qty:original.qty||1};
+        for(const [category,products] of Object.entries(ORDER_CATALOG)){
+          const found=Object.keys(products).find(product=>String(original.product||original.title).toLowerCase().includes(product.toLowerCase()));
+          if(found){pick.category=category;pick.product=found;break;}
+        }
+        const products=Object.keys(ORDER_CATALOG[pick.category]);if(!pick.product)pick.product=products[0];
+        const finishes=ORDER_CATALOG[pick.category][pick.product];pick.finish=finishes.find(v=>String(original.finish||original.detail).toLowerCase().includes(v.toLowerCase()))||finishes[0];
+        const esc=integrationEsc;
+        const tiles=(values,key)=>`<div class="quick-tile-group">${values.map(value=>`<button type="button" class="quick-tile ${String(pick[key])===String(value)?'selected':''}" data-edit-quick-key="${key}" data-edit-quick-value="${esc(value)}">${esc(value)}</button>`).join('')}</div>`;
+        const render=()=>{
+          const categoryProducts=Object.keys(ORDER_CATALOG[pick.category]);if(!categoryProducts.includes(pick.product))pick.product=categoryProducts[0];
+          const categoryFinishes=ORDER_CATALOG[pick.category][pick.product];if(!categoryFinishes.includes(pick.finish))pick.finish=categoryFinishes[0];
+          openIntegrationModal(`Edit Order #${order.number}`,`<p class="active-edit-note">Edit this Active Cart order using the same tile workflow as Quick Order.</p><div class="quick-identity"><label>Customer / Pro Name<input id="editQuickCustomer" value="${esc(order.customer||'')}"></label><label>Phone Number<input id="editQuickPhone" type="tel" value="${esc(order.phone||'')}"></label></div><label class="quick-label">Category</label>${tiles(Object.keys(ORDER_CATALOG),'category')}<label class="quick-label">Product</label>${tiles(categoryProducts,'product')}<label class="quick-label">Finish / Sheen / Opacity</label>${tiles(categoryFinishes,'finish')}<label class="quick-label">Container</label>${tiles(['Single Gallon','5-Gallon Pail'],'container')}<label class="quick-label">Quantity</label>${tiles([1,2,3,4,5,10,'Custom'],'qty')}<input id="editQuickCustomQty" class="field ${pick.qty==='Custom'?'':'hide'}" type="number" min="1" value="${Number(original.qty)||1}"><div class="quick-identity quick-details"><label>Color Name / Number<input id="editQuickColor" value="${esc(original.color||'')}"></label><label>Order Note / Area<input id="editQuickNotes" value="${esc(original.notes||'')}"></label></div><button type="button" class="btn primary order-primary-action" id="saveQuickStyleEdit">Save Order Changes</button>`);
+          const modal=$('#integrationModal');
+          modal.querySelectorAll('[data-edit-quick-key]').forEach(button=>button.onclick=()=>{const key=button.dataset.editQuickKey,value=button.dataset.editQuickValue;pick[key]=key==='qty'&&value!=='Custom'?Number(value):value;render()});
+          $('#saveQuickStyleEdit').onclick=()=>{
+            const qty=pick.qty==='Custom'?Math.max(1,parseInt($('#editQuickCustomQty').value,10)||1):Number(pick.qty);
+            const color=$('#editQuickColor').value.trim(),notes=$('#editQuickNotes').value.trim();
+            order.customer=$('#editQuickCustomer').value.trim();order.phone=$('#editQuickPhone').value.trim();
+            order.lines=[{...original,qty,originalQty:original.originalQty||original.qty||qty,product:pick.product,finish:pick.finish,color,notes,title:`${pick.product} · ${pick.finish}`,detail:[color,pick.container,notes].filter(Boolean).join(' · ')}];
+            saveOrderState();modal.remove();renderOrderCenter();toast('Active Cart changes saved');
+          };
         };
-        renderEditor();
+        render();
     }
 
     function availableWalksForLink(){
@@ -9493,7 +9504,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
  const handled=new WeakSet();
  function invoke(event){
   if(handled.has(event))return;
-  const target=event.target.closest&&event.target.closest('#orderCenterIntegration .order-tab,#orderCenterIntegration [data-order-action],#orderCenterIntegration [data-order-link]');
+  const target=event.target.closest&&event.target.closest('#orderCenterIntegration .order-tab,#orderCenterIntegration [data-order-action]');
   if(!target)return;
   handled.add(event);event.preventDefault();event.stopImmediatePropagation();
   try{
@@ -10694,6 +10705,319 @@ body[data-app-view]:not([data-app-view="home"]) #edit{
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});syncScroll()},{once:true});
  else{observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});syncScroll()}
  window.addEventListener('pageshow',syncScroll);
+})();
+</script>
+
+<style id="v36-rev-aa-walk-link-modal-final-contrast">
+/* Rev AA: authoritative contrast for Change/Link Walk modal. */
+#walkLinkerModal .walk-link-sheet{
+ background:#f8fafc!important;
+ color:#111827!important;
+}
+#walkLinkerModal :is(.walk-link-kicker,.walk-link-sheet h2,.walk-link-sheet h3,.walk-link-sheet p,.walk-link-sheet label,.walk-link-sheet small),
+#walkLinkerModal :is(.walk-link-kicker,.walk-link-sheet h2,.walk-link-sheet h3,.walk-link-sheet p,.walk-link-sheet label,.walk-link-sheet small) *{
+ color:#111827!important;
+ -webkit-text-fill-color:#111827!important;
+ opacity:1!important;
+ text-shadow:none!important;
+}
+#walkLinkerModal .walk-link-kicker{color:#8a3f0d!important;-webkit-text-fill-color:#8a3f0d!important}
+#walkLinkerModal .walk-link-close,
+#walkLinkerModal .walk-link-close *{
+ background:#e7edf3!important;
+ color:#111827!important;
+ -webkit-text-fill-color:#111827!important;
+ opacity:1!important;
+}
+#walkLinkerModal input{
+ background:#101114!important;
+ color:#fff!important;
+ -webkit-text-fill-color:#fff!important;
+ border-color:#b65d23!important;
+ caret-color:#fff!important;
+ opacity:1!important;
+}
+#walkLinkerModal input::placeholder{
+ color:#ffd8b5!important;
+ -webkit-text-fill-color:#ffd8b5!important;
+ opacity:1!important;
+}
+#walkLinkerModal :is(.walk-link-result,.walk-link-empty),
+#walkLinkerModal :is(.walk-link-result,.walk-link-empty) *{
+ background:#fff!important;
+ color:#111827!important;
+ -webkit-text-fill-color:#111827!important;
+ opacity:1!important;
+ text-shadow:none!important;
+}
+#walkLinkerModal .walk-link-result{
+ border-color:#cbd5e1!important;
+}
+#walkLinkerModal .walk-link-result:hover,
+#walkLinkerModal .walk-link-result:focus-visible{
+ background:#fff0d2!important;
+ border-color:#ad4c13!important;
+}
+</style>
+
+<style id="v36-rev-aa-order-modal-stable-position-style">
+/* Keep Order Center editors internally scrollable without moving the page. */
+#integrationModal .integration-sheet,
+#integrationModal .integration-modal-sheet,
+#integrationModal .modalbox{
+  max-height:92dvh!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+  scroll-behavior:auto!important;
+}
+</style>
+<script id="v36-rev-aa-order-modal-stable-position">
+(()=>{
+ 'use strict';
+ const selector='[data-quick-key],[data-edit-quick-key]';
+ function scrollHost(modal){
+   if(!modal)return null;
+   const preferred=modal.querySelector('.integration-sheet,.integration-modal-sheet,.modalbox');
+   if(preferred)return preferred;
+   return [...modal.querySelectorAll('*')].find(el=>{const css=getComputedStyle(el);return /(auto|scroll)/.test(css.overflowY)&&el.scrollHeight>el.clientHeight})||modal;
+ }
+ document.addEventListener('click',event=>{
+   const tile=event.target.closest?.(selector);
+   if(!tile)return;
+   const oldModal=document.getElementById('integrationModal');
+   const oldHost=scrollHost(oldModal);
+   const modalTop=oldHost?.scrollTop||0;
+   const pageX=window.scrollX,pageY=window.scrollY;
+   const tileTop=tile.getBoundingClientRect().top;
+   const restore=()=>{
+     const modal=document.getElementById('integrationModal');
+     const host=scrollHost(modal);
+     if(host)host.scrollTop=modalTop;
+     window.scrollTo(pageX,pageY);
+     /* Keep the selected row at the same visible height if layout above changes. */
+     const key=tile.dataset.quickKey||tile.dataset.editQuickKey;
+     const value=tile.dataset.quickValue||tile.dataset.editQuickValue;
+     const replacement=[...document.querySelectorAll(selector)].find(el=>(el.dataset.quickKey||el.dataset.editQuickKey)===key&&(el.dataset.quickValue||el.dataset.editQuickValue)===value);
+     if(replacement&&host){const delta=replacement.getBoundingClientRect().top-tileTop;if(Math.abs(delta)>2)host.scrollTop+=delta;}
+   };
+   requestAnimationFrame(()=>requestAnimationFrame(restore));
+   setTimeout(restore,40);
+   setTimeout(restore,140);
+ },true);
+})();
+</script>
+
+<style id="v36-rev-aa-walk-search-input-authority">
+/* Final authority: typed search text must remain white on the black walk-search field. */
+html body #walkLinkerModal .walk-link-sheet input[type="search"],
+html body #walkLinkerModal .walk-link-sheet input[type="text"],
+html body #walkLinkerModal input{
+  background-color:#101114!important;
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  caret-color:#ffffff!important;
+  opacity:1!important;
+  filter:none!important;
+  text-shadow:none!important;
+  color-scheme:dark!important;
+}
+html body #walkLinkerModal input::placeholder{
+  color:#ffd8b5!important;
+  -webkit-text-fill-color:#ffd8b5!important;
+  opacity:1!important;
+}
+html body #walkLinkerModal input:-webkit-autofill,
+html body #walkLinkerModal input:-webkit-autofill:hover,
+html body #walkLinkerModal input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#ffffff!important;
+  -webkit-box-shadow:0 0 0 1000px #101114 inset!important;
+  caret-color:#ffffff!important;
+}
+</style>
+<script id="v36-rev-aa-walk-search-input-runtime">
+(()=>{
+ 'use strict';
+ function enforce(input){
+   if(!input||!input.closest('#walkLinkerModal'))return;
+   input.style.setProperty('background-color','#101114','important');
+   input.style.setProperty('color','#ffffff','important');
+   input.style.setProperty('-webkit-text-fill-color','#ffffff','important');
+   input.style.setProperty('caret-color','#ffffff','important');
+ }
+ document.addEventListener('focusin',event=>enforce(event.target),true);
+ document.addEventListener('input',event=>enforce(event.target),true);
+ new MutationObserver(()=>document.querySelectorAll('#walkLinkerModal input').forEach(enforce)).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+
+<style id="v36-rev-aa-quick-edit-modal-contrast-authority">
+/* Quick Order and Edit Order: light modal surfaces always use dark text. */
+#integrationModal .integration-sheet,
+#integrationModal .integration-modal-sheet,
+#integrationModal .modalbox{
+  background:#f8fafc!important;
+  color:#111827!important;
+}
+#integrationModal :is(h1,h2,h3,h4,p,label,.quick-label,.active-edit-note,.quick-walk-note),
+#integrationModal :is(h1,h2,h3,h4,p,label,.quick-label,.active-edit-note,.quick-walk-note) *{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+/* Required markers retain a strong warm accent. */
+#integrationModal label>b,
+#integrationModal .quick-identity label>b{
+  color:#8a3f0d!important;
+  -webkit-text-fill-color:#8a3f0d!important;
+}
+/* Dark entry fields require white typed text. */
+#integrationModal :is(input,textarea,select){
+  background:#101114!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  caret-color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+#integrationModal :is(input,textarea)::placeholder{
+  color:#ffd8b5!important;
+  -webkit-text-fill-color:#ffd8b5!important;
+  opacity:1!important;
+}
+/* Orange unselected tiles use near-black; dark selected tiles use white. */
+#integrationModal .quick-tile:not(.selected),
+#integrationModal .quick-tile:not(.selected) *{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+}
+#integrationModal .quick-tile.selected,
+#integrationModal .quick-tile.selected *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+}
+#integrationModal .quick-walk-note{
+  background:#eaf5fa!important;
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+}
+#integrationModal .integration-close,
+#integrationModal .integration-close *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+</style>
+
+<script id="v36-rev-aa-quick-modal-runtime-contrast-final">
+(()=>{
+ 'use strict';
+ const put=(el,prop,value)=>el?.style.setProperty(prop,value,'important');
+ function apply(){
+   const modal=document.getElementById('integrationModal');
+   if(!modal)return;
+   const sheet=modal.querySelector('.integration-sheet');
+   put(sheet,'background','#f8fafc');put(sheet,'color','#111827');
+   modal.querySelectorAll('.integration-sheet-head h2,.quick-identity label,.quick-label,.walk-search-box label').forEach(el=>{
+     put(el,'color','#111827');put(el,'-webkit-text-fill-color','#111827');put(el,'opacity','1');put(el,'text-shadow','none');
+   });
+   modal.querySelectorAll('.quick-walk-note,.quick-walk-note *').forEach(el=>{
+     put(el,'color','#111827');put(el,'-webkit-text-fill-color','#111827');put(el,'opacity','1');
+   });
+   modal.querySelectorAll('input,textarea,select').forEach(el=>{
+     put(el,'background-color','#101114');put(el,'color','#ffffff');put(el,'-webkit-text-fill-color','#ffffff');put(el,'caret-color','#ffffff');put(el,'opacity','1');
+   });
+   modal.querySelectorAll('.quick-tile').forEach(el=>{
+     const selected=el.classList.contains('selected');
+     put(el,'color',selected?'#ffffff':'#111827');put(el,'-webkit-text-fill-color',selected?'#ffffff':'#111827');put(el,'opacity','1');
+   });
+ }
+ const observer=new MutationObserver(apply);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{observer.observe(document.body,{childList:true,subtree:true});apply()},{once:true});
+ else{observer.observe(document.body,{childList:true,subtree:true});apply()}
+ document.addEventListener('click',event=>{if(event.target.closest?.('[data-quick-key],[data-edit-quick-key],#quickOrderIntegration,[data-order-action="edit"]')){setTimeout(apply,0);setTimeout(apply,60)}},true);
+})();
+</script>
+
+<style id="v36-rev-aa-undo-direct-final">
+/* Exact generated control: dark backgrounds always use white text. */
+html body #undoLastChange,
+html body #undoLastChange:hover,
+html body #undoLastChange:focus,
+html body #undoLastChange:focus-visible,
+html body #undoLastChange:active,
+html body #undoLastChange.active,
+html body #undoLastChange.selected,
+html body #undoLastChange:disabled,
+html body #undoLastChange[disabled],
+html body #undoLastChange *{
+ color:#fff!important;
+ -webkit-text-fill-color:#fff!important;
+ opacity:1!important;
+ text-shadow:none!important;
+ filter:none!important;
+}
+</style>
+<script id="v36-rev-aa-undo-direct-runtime">
+(()=>{
+ 'use strict';
+ function fix(){
+  const el=document.getElementById('undoLastChange');
+  if(!el)return;
+  el.style.setProperty('color','#fff','important');
+  el.style.setProperty('-webkit-text-fill-color','#fff','important');
+  el.style.setProperty('opacity','1','important');
+  el.querySelectorAll('*').forEach(child=>{
+   child.style.setProperty('color','#fff','important');
+   child.style.setProperty('-webkit-text-fill-color','#fff','important');
+   child.style.setProperty('opacity','1','important');
+  });
+ }
+ const observer=new MutationObserver(fix);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','disabled']});fix()},{once:true});
+ else{observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style','disabled']});fix()}
+ document.addEventListener('click',()=>setTimeout(fix,0),true);
+})();
+</script>
+
+<style id="v36-rev-aa-scope-launcher-final-contrast">
+/* New Project launcher: light modal and pastel cards use dark text. */
+#scopeLauncher .scope-launcher-sheet{
+ background:#fff!important;color:#111827!important;
+}
+#scopeLauncher :is(.scope-launcher-kicker,.scope-launcher-sheet h1,.scope-launcher-sheet h2,.scope-launcher-sheet h3,.scope-launcher-sheet p,.scope-launcher-note),
+#scopeLauncher :is(.scope-launcher-kicker,.scope-launcher-sheet h1,.scope-launcher-sheet h2,.scope-launcher-sheet h3,.scope-launcher-sheet p,.scope-launcher-note) *{
+ color:#111827!important;-webkit-text-fill-color:#111827!important;opacity:1!important;text-shadow:none!important;
+}
+#scopeLauncher [data-launch-scope],
+#scopeLauncher [data-launch-scope] *{
+ color:#111827!important;-webkit-text-fill-color:#111827!important;opacity:1!important;text-shadow:none!important;
+}
+#scopeLauncher [data-launch-scope]:hover,
+#scopeLauncher [data-launch-scope]:focus-visible{
+ filter:none!important;box-shadow:0 0 0 4px #ad4c1330!important;
+}
+#scopeLauncher #cancelScopeLauncher,
+#scopeLauncher #cancelScopeLauncher *{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;
+}
+#scopeLauncher .scope-launcher-note{
+ background:#eaf3f8!important;color:#111827!important;-webkit-text-fill-color:#111827!important;
+}
+</style>
+<script id="v36-rev-aa-scope-launcher-runtime-contrast">
+(()=>{
+ 'use strict';
+ const put=(el,p,v)=>el?.style.setProperty(p,v,'important');
+ function fix(){
+  const modal=document.getElementById('scopeLauncher');if(!modal)return;
+  modal.querySelectorAll('.scope-launcher-kicker,.scope-launcher-sheet h1,.scope-launcher-sheet h2,.scope-launcher-sheet h3,.scope-launcher-sheet p,.scope-launcher-note,[data-launch-scope],[data-launch-scope] *').forEach(el=>{put(el,'color','#111827');put(el,'-webkit-text-fill-color','#111827');put(el,'opacity','1');put(el,'text-shadow','none')});
+  const cancel=document.getElementById('cancelScopeLauncher');if(cancel){put(cancel,'color','#fff');put(cancel,'-webkit-text-fill-color','#fff');cancel.querySelectorAll('*').forEach(el=>{put(el,'color','#fff');put(el,'-webkit-text-fill-color','#fff')})}
+ }
+ const observer=new MutationObserver(fix);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});fix()},{once:true});else{observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});fix()}
+ document.addEventListener('click',e=>{if(e.target.closest?.('#new2,#scopeLauncher,[data-launch-scope]'))setTimeout(fix,0)},true);
 })();
 </script>
 </body></html>
