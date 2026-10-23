@@ -1383,7 +1383,25 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
 </div><h3 class="summary-shopping">Shopping List by Product, Color &amp; Finish</h3><div class="plist" id="paintOrder"></div></div></section></section><section class="card hide" id="orderCenterIntegration">
 <div class="order-head"><div><h2>Order Center</h2><p>Active Cart → Waiting for Mix → Completed</p></div><button class="btn primary" id="quickOrderIntegration">+ Quick Order</button></div>
 <div class="order-tabs"><button class="order-tab active" data-order-tab="active">Active Cart <b id="activeOrderCount">0</b></button><button class="order-tab" data-order-tab="waiting">Waiting for Mix <b id="waitingOrderCount">0</b></button><button class="order-tab" data-order-tab="staged">Completed</button></div>
-<div id="orderIntegrationList"></div></section></main><div class="bottom hide" id="bottom"><div><button class="btn danger" id="del">Delete</button><button class="btn order-sell" id="sellProductIntegration">Sell Product</button><button class="btn primary" id="save">Save Project</button></div></div><div class="modal hide" id="rectModal"><div class="modalbox"><h3>Complete room with equal sides?</h3><p>Choose Yes to set Wall 3 equal to Wall 1 and Wall 4 equal to Wall 2. Choose No to continue adding custom walls.</p><div class="modalactions"><button class="btn ghost" id="rectNo">No, continue custom walls</button><button class="btn primary" id="rectYes">Yes, complete room</button></div></div></div><div class="toast" id="toast"></div><div class="photo-view hide" id="photoViewer"><button class="btn ghost" id="closePhoto">Close</button><img alt="Project photo" id="photoViewerImg"/></div><div id="v36MissingControlCompatibility" style="display:none!important" aria-hidden="true"><button type="button" id="smartCaptureClose"></button><button type="button" id="smartCaptureReview"></button><button type="button" id="smartCaptureCamera"></button><button type="button" id="smartCaptureLibrary"></button><button type="button" id="smartCaptureAnalyze"></button><button type="button" id="smartCaptureApply"></button><button type="button" id="undoLastChange"></button><button type="button" id="cloneCurrentProject"></button><button type="button" id="bottomCloneProject"></button><button type="button" id="addManualShoppingItem"></button><button type="button" id="requestPersistentStorage"></button><button type="button" id="installApp"></button><button type="button" id="exportOne"></button><button type="button" id="erase"></button><input type="file" id="smartCaptureCameraInput"><input type="file" id="smartCaptureLibraryInput"><input type="file" id="importOne"></div><script>
+<div id="orderIntegrationList"></div></section></main><div class="bottom hide" id="bottom"><div><button class="btn danger" id="del">Delete</button><button class="btn order-sell" id="sellProductIntegration">Sell Product</button><button class="btn primary" id="save">Save Project</button></div></div><div class="modal hide" id="rectModal"><div class="modalbox"><h3>Complete room with equal sides?</h3><p>Choose Yes to set Wall 3 equal to Wall 1 and Wall 4 equal to Wall 2. Choose No to continue adding custom walls.</p><div class="modalactions"><button class="btn ghost" id="rectNo">No, continue custom walls</button><button class="btn primary" id="rectYes">Yes, complete room</button></div></div></div><div class="toast" id="toast"></div><div class="photo-view hide" id="photoViewer"><button class="btn ghost" id="closePhoto">Close</button><img alt="Project photo" id="photoViewerImg"/></div><div id="v36MissingControlCompatibility" style="display:none!important" aria-hidden="true"><button type="button" id="smartCaptureClose"></button><button type="button" id="smartCaptureReview"></button><button type="button" id="smartCaptureCamera"></button><button type="button" id="smartCaptureLibrary"></button><button type="button" id="smartCaptureAnalyze"></button><button type="button" id="smartCaptureApply"></button><button type="button" id="undoLastChange"></button><button type="button" id="cloneCurrentProject"></button><button type="button" id="bottomCloneProject"></button><button type="button" id="addManualShoppingItem"></button><button type="button" id="requestPersistentStorage"></button><button type="button" id="installApp"></button><button type="button" id="exportOne"></button><button type="button" id="erase"></button><input type="file" id="smartCaptureCameraInput"><input type="file" id="smartCaptureLibraryInput"><input type="file" id="importOne"></div><script id="v36-rev-aa-continue-new-early-bridge">
+(()=>{
+ 'use strict';
+ document.addEventListener('click',event=>{
+   const continueButton=event.target.closest?.('#continueCurrentProject');
+   const newButton=event.target.closest?.('#createNewProjectAnyway');
+   if(!continueButton&&!newButton)return;
+   event.preventDefault();event.stopImmediatePropagation();
+   document.getElementById('continueOrNewProjectPrompt')?.classList.add('hide');
+   document.body.classList.remove('smart-modal-open');
+   if(continueButton){
+     if(typeof window.__ppmContinueCurrentProject==='function')window.__ppmContinueCurrentProject();
+     return;
+   }
+   if(typeof window.__ppmCreateNewProject==='function')window.__ppmCreateNewProject();
+ },true);
+})();
+</script>
+<script>
 
 
 (() => {
@@ -7840,6 +7858,18 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
         if (!prompt) { show('#edit'); return; }
         prompt.classList.remove('hide');
         document.body.classList.add('smart-modal-open');
+        window.__ppmContinueCurrentProject = () => {
+            prompt.classList.add('hide');
+            document.body.classList.remove('smart-modal-open');
+            fill();
+            show('#edit');
+            requestAnimationFrame(() => $('#edit')?.scrollIntoView({ block: 'start' }));
+        };
+        window.__ppmCreateNewProject = () => {
+            prompt.classList.add('hide');
+            document.body.classList.remove('smart-modal-open');
+            showNativeScopeLauncher();
+        };
         $('#continueCurrentProject')?.focus();
     }
     function closeNeutralProjectLauncher() {
@@ -10550,6 +10580,7 @@ body:not([data-app-view="home"]) #undoLastChange[disabled]{
 <style id="v36-rev-aa-continue-or-new-project-style">
 #continueOrNewProjectPrompt{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:18px;background:#08090be8}
 #continueOrNewProjectPrompt.hide{display:none!important}
+#continueOrNewProjectPrompt,#continueOrNewProjectPrompt *{pointer-events:auto!important}
 .continue-new-card{width:min(620px,100%);padding:22px;border:2px solid #9b572c;border-radius:20px;background:#fff;color:#17212b;box-shadow:0 24px 80px #000b}
 .continue-new-card h2,.continue-new-card p{color:#17212b!important;-webkit-text-fill-color:#17212b!important;opacity:1!important}
 .continue-new-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
@@ -10568,20 +10599,101 @@ body:not([data-app-view="home"]) #undoLastChange[disabled]{
   </div>
  </div>
 </div>
-<script id="v36-rev-aa-continue-or-new-project-script">
+<script id="v36-rev-aa-continue-or-new-project-script">/* Disabled: Rev AA early capture bridge owns these buttons. */</script>
+
+<style id="v36-rev-aa-undo-global-final-contrast">
+#undoLastChange,#undoLastChange:hover,#undoLastChange:focus,#undoLastChange:focus-visible,
+#undoLastChange:active,#undoLastChange.active,#undoLastChange.selected,
+#undoLastChange:disabled,#undoLastChange[disabled],
+#undoLastChange *,#undoLastChange:hover *,#undoLastChange:focus *,
+#undoLastChange:active *,#undoLastChange:disabled *{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important;opacity:1!important;filter:none!important
+}
+#undoLastChange{background:#3a2417!important;border:2px solid #ff8a31!important}
+#undoLastChange:hover,#undoLastChange:focus-visible,#undoLastChange:active,
+#undoLastChange.active,#undoLastChange.selected{background:#ad4c13!important;border-color:#ffd0ad!important}
+#undoLastChange:disabled,#undoLastChange[disabled]{background:#4b403a!important;border-color:#9b7359!important}
+</style>
+
+<style id="v36-rev-aa-exterior-light-header-final-contrast">
+/* Rev AA maintenance: every light-blue Exterior Paint surface uses dark ink. */
+#exteriorGroup .scope-head,
+#exteriorGroup .scope-head:hover,
+#exteriorGroup .scope-head:focus,
+#exteriorGroup .scope-head:focus-visible,
+#exteriorGroup .scope-head:active,
+#exteriorGroup .scope-head[aria-expanded="true"],
+#exteriorGroup .scope-head[aria-expanded="false"],
+#exteriorGroup .scope-head *,
+#exteriorGroup .scope-head:hover *,
+#exteriorGroup .scope-head:focus *,
+#exteriorGroup .scope-head:active *,
+#exteriorGroup .scope-head[aria-expanded="true"] *,
+#exteriorGroup .scope-head[aria-expanded="false"] *{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+#exteriorGroup .scope-head{
+  background:#dbeafe!important;
+  border-color:#60a5fa!important;
+}
+/* The visible expand/collapse mark must follow the same dark-on-light rule. */
+#exteriorGroup .scope-head::before,
+#exteriorGroup .scope-head::after{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+}
+/* Pale-blue elevation rows also stay dark in every state. */
+#exteriorGroup :is(.area-head,.elevation-head,.exterior-elevation-head),
+#exteriorGroup :is(.area-head,.elevation-head,.exterior-elevation-head) *{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+</style>
+
+<style id="v36-rev-aa-project-scroll-authority">
+/* New Project must scroll whenever no blocking modal is visible. */
+html,body{overflow-x:hidden}
+body[data-app-view]:not([data-app-view="home"]):not(.ppm-blocking-modal-open),
+body[data-app-view]:not([data-app-view="home"]):not(.ppm-blocking-modal-open) html{
+  overflow-y:auto!important;
+  height:auto!important;
+  min-height:100%!important;
+}
+body[data-app-view]:not([data-app-view="home"]) #edit{
+  overflow:visible!important;
+  height:auto!important;
+  min-height:100dvh!important;
+}
+</style>
+<script id="v36-rev-aa-project-scroll-recovery">
 (()=>{
  'use strict';
- const modal=()=>document.getElementById('continueOrNewProjectPrompt');
- document.getElementById('continueCurrentProject')?.addEventListener('click',()=>{
-   modal()?.classList.add('hide');document.body.classList.remove('smart-modal-open');
-   if(typeof fill==='function')fill();
-   if(typeof show==='function')show('#edit');
-   requestAnimationFrame(()=>document.getElementById('edit')?.scrollIntoView({block:'start'}));
- });
- document.getElementById('createNewProjectAnyway')?.addEventListener('click',()=>{
-   modal()?.classList.add('hide');document.body.classList.remove('smart-modal-open');
-   if(typeof showNativeScopeLauncher==='function')showNativeScopeLauncher();
- });
+ const blockingIds=['smartCaptureReview','scopeLauncher','exteriorWorkflowLauncher','rectModal','continueOrNewProjectPrompt','ppmInstallPrompt','maintenanceReminder'];
+ function visible(el){return !!el&&!el.classList.contains('hide')&&getComputedStyle(el).display!=='none'}
+ function syncScroll(){
+   const blocked=blockingIds.some(id=>visible(document.getElementById(id)));
+   document.body.classList.toggle('ppm-blocking-modal-open',blocked);
+   if(!blocked){
+     document.body.classList.remove('smart-modal-open');
+     document.body.style.removeProperty('overflow');
+     document.documentElement.style.removeProperty('overflow');
+   }
+ }
+ document.addEventListener('click',event=>{
+   if(event.target.closest?.('[data-rev-t-add],[data-add-scope],[data-exterior-workflow],#cancelExteriorWorkflow,#continueCurrentProject,#createNewProjectAnyway')){
+     setTimeout(syncScroll,0);setTimeout(syncScroll,120);setTimeout(syncScroll,350);
+   }
+ },true);
+ const observer=new MutationObserver(syncScroll);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});syncScroll()},{once:true});
+ else{observer.observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});syncScroll()}
+ window.addEventListener('pageshow',syncScroll);
 })();
 </script>
 </body></html>
