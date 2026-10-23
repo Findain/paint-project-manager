@@ -7959,6 +7959,34 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
         const bump = $('#wholeHouseBumpOut');
         if (bump) bump.checked = !!(cur?.areas || []).some(item => isExteriorPaintElevation(item) && item.name === 'Bump-Out');
     }
+    window.__ppmAddExteriorWorkflow = mode => {
+        if (!cur) return false;
+        cur.scopeExterior = true;
+        const scopeInput = $('#scopeExterior');
+        if (scopeInput) scopeInput.checked = true;
+        ensureScopeAreas('scopeExterior');
+        cur.exteriorWorkflow = mode === 'wholeHouse' ? 'wholeHouse' : 'elevations';
+        const exteriorAreas = (cur.areas || []).filter(isExteriorPaintElevation);
+        const primary = exteriorAreas[0];
+        if (primary && cur.exteriorWorkflow === 'wholeHouse') {
+            primary.name = 'Whole House';
+            primary.walls = [0,0,0,0];
+            primary.wallAxes = ['length','width','length','width'];
+            primary.bumpOut = false;
+            /* A fresh Whole House selection owns one primary card, not default side cards. */
+            cur.areas = (cur.areas || []).filter(item => !isExteriorPaintElevation(item) || item === primary || item.name === 'Bump-Out');
+        } else if (primary && cur.exteriorWorkflow === 'elevations' && primary.name === 'Whole House') {
+            primary.name = 'Elevation 1';
+        }
+        fill();
+        renderExteriorWorkflowMode();
+        const group = $('#exteriorGroup');
+        group?.classList.remove('hide','collapsed');
+        cur.groupCollapsedExterior = false;
+        applyGroupState('exteriorGroup', false);
+        mark();
+        return true;
+    };
     $('#wholeHouseBumpOut').onchange = event => {
         if (!cur || cur.exteriorWorkflow !== 'wholeHouse') return;
         const existing = cur.areas.find(item => isExteriorPaintElevation(item) && item.name === 'Bump-Out');
@@ -10244,18 +10272,7 @@ body[data-workflow-mode="stain"] #edit :is(#interiorGroup,#exteriorGroup){displa
    document.body.classList.remove('smart-modal-open');
    const input=document.getElementById('scopeExterior');
    if(input&&!input.checked){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}
-   if(typeof cur!=='undefined'&&cur){
-     cur.scopeExterior=true;
-     cur.exteriorWorkflow=mode;
-     if(typeof ensureScopeAreas==='function')ensureScopeAreas('scopeExterior');
-     const elevation=(cur.areas||[]).find(item=>typeof isExteriorPaintElevation==='function'&&isExteriorPaintElevation(item));
-     if(elevation&&mode==='wholeHouse'){
-       elevation.name='Whole House';elevation.walls=[0,0,0,0];elevation.wallAxes=['length','width','length','width'];elevation.bumpOut=false;
-     }
-     if(typeof fill==='function')fill();
-     if(typeof renderExteriorWorkflowMode==='function')renderExteriorWorkflowMode();
-     if(typeof mark==='function')mark();
-   }
+   if(typeof window.__ppmAddExteriorWorkflow==='function')window.__ppmAddExteriorWorkflow(mode);
    document.body.dataset.workflowMode='exterior';
    const group=document.getElementById('exteriorGroup');
    group?.classList.remove('hide','collapsed');
