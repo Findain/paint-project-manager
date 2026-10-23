@@ -7824,18 +7824,23 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
     installSmartCaptureUI();
 
     $('#home').onclick = () => { if (!guardProjectSwitch('go home')) return; $('#orderCenterIntegration')?.classList.add('hide'); show('#h'); renderOrderCenter(); };
-    function openNeutralProjectLauncher() {
-        const startedProject = !!cur && projectWorkflowStarted(cur);
-        const pendingProject = startedProject && (hasUnsavedChanges || !!autosaveTimer);
-        if (pendingProject) {
-            const saved = autosaveNow(cur.id, true);
-            const stillPending = !saved || !hasProjectIdentity(cur);
-            if (stillPending && !confirm('This project has unsaved changes. Start a new project anyway?')) return;
-        }
+    function showNativeScopeLauncher() {
         cancelAutosave();
         $('#scopeLauncher').classList.remove('hide');
         document.body.classList.add('smart-modal-open');
         $('#scopeLauncher').querySelector('[data-launch-scope]')?.focus();
+    }
+    function openNeutralProjectLauncher() {
+        const startedProject = !!cur && projectWorkflowStarted(cur);
+        if (!startedProject) { showNativeScopeLauncher(); return; }
+        /* Preserve the active walk before asking what to do. */
+        autosaveNow(cur.id, true);
+        writeRecoveryDraft(cur);
+        const prompt = $('#continueOrNewProjectPrompt');
+        if (!prompt) { show('#edit'); return; }
+        prompt.classList.remove('hide');
+        document.body.classList.add('smart-modal-open');
+        $('#continueCurrentProject')?.focus();
     }
     function closeNeutralProjectLauncher() {
         $('#scopeLauncher').classList.add('hide');
@@ -10541,4 +10546,42 @@ body:not([data-app-view="home"]) #undoLastChange[disabled]{
   text-shadow:none!important;
 }
 </style>
+
+<style id="v36-rev-aa-continue-or-new-project-style">
+#continueOrNewProjectPrompt{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:18px;background:#08090be8}
+#continueOrNewProjectPrompt.hide{display:none!important}
+.continue-new-card{width:min(620px,100%);padding:22px;border:2px solid #9b572c;border-radius:20px;background:#fff;color:#17212b;box-shadow:0 24px 80px #000b}
+.continue-new-card h2,.continue-new-card p{color:#17212b!important;-webkit-text-fill-color:#17212b!important;opacity:1!important}
+.continue-new-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.continue-new-actions button{min-height:58px;border-radius:13px;font-weight:950;font-size:16px}
+#continueCurrentProject{background:#351d13!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:2px solid #ff8a31!important}
+#createNewProjectAnyway{background:#ad4c13!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:2px solid #ffb47e!important}
+@media(max-width:560px){.continue-new-actions{grid-template-columns:1fr}}
+</style>
+<div id="continueOrNewProjectPrompt" class="hide" role="dialog" aria-modal="true" aria-labelledby="continueOrNewTitle">
+ <div class="continue-new-card">
+  <h2 id="continueOrNewTitle">A project is already in progress</h2>
+  <p>The current walk has been saved. Continue the current project, or create a new project?</p>
+  <div class="continue-new-actions">
+   <button type="button" id="continueCurrentProject">Continue Current Project</button>
+   <button type="button" id="createNewProjectAnyway">Create New Project</button>
+  </div>
+ </div>
+</div>
+<script id="v36-rev-aa-continue-or-new-project-script">
+(()=>{
+ 'use strict';
+ const modal=()=>document.getElementById('continueOrNewProjectPrompt');
+ document.getElementById('continueCurrentProject')?.addEventListener('click',()=>{
+   modal()?.classList.add('hide');document.body.classList.remove('smart-modal-open');
+   if(typeof fill==='function')fill();
+   if(typeof show==='function')show('#edit');
+   requestAnimationFrame(()=>document.getElementById('edit')?.scrollIntoView({block:'start'}));
+ });
+ document.getElementById('createNewProjectAnyway')?.addEventListener('click',()=>{
+   modal()?.classList.add('hide');document.body.classList.remove('smart-modal-open');
+   if(typeof showNativeScopeLauncher==='function')showNativeScopeLauncher();
+ });
+})();
+</script>
 </body></html>
