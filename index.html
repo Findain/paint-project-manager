@@ -7178,12 +7178,8 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
     }
 
     function guardProjectSwitch(action) {
-        if (!cur || (!hasUnsavedChanges && !autosaveTimer)) return true;
-        const projectId = cur.id;
-        const saved = autosaveNow(projectId, true);
-        if (saved && hasProjectIdentity(cur)) return true;
-        const message = `Unsaved changes are still pending. ${hasProjectIdentity(cur) ? 'A recovery copy was attempted.' : 'This project needs a phone or address before it can be added to Saved Projects.'}\n\nContinue to ${action}? The current recovery draft may be replaced.`;
-        return confirm(message);
+        /* Rev U: warnings are handled only by the New Project launcher. */
+        return true;
     }
 
 
@@ -7829,7 +7825,13 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
 
     $('#home').onclick = () => { if (!guardProjectSwitch('go home')) return; $('#orderCenterIntegration')?.classList.add('hide'); show('#h'); renderOrderCenter(); };
     function openNeutralProjectLauncher() {
-        if (!guardProjectSwitch('start a new project')) return;
+        const startedProject = !!cur && projectWorkflowStarted(cur);
+        const pendingProject = startedProject && (hasUnsavedChanges || !!autosaveTimer);
+        if (pendingProject) {
+            const saved = autosaveNow(cur.id, true);
+            const stillPending = !saved || !hasProjectIdentity(cur);
+            if (stillPending && !confirm('This project has unsaved changes. Start a new project anyway?')) return;
+        }
         cancelAutosave();
         $('#scopeLauncher').classList.remove('hide');
         document.body.classList.add('smart-modal-open');
@@ -9095,7 +9097,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
     }, { passive: true });
 
 
-    window.addEventListener('beforeunload', event => { if (!hasUnsavedChanges || !projectWorkflowStarted(cur)) return; writeRecoveryDraft(cur); event.preventDefault(); event.returnValue = ''; });
+    /* Rev U: no warning on browser close, Home, Settings, Orders, Previous Projects, or other navigation. */
     window.addEventListener('pagehide', () => flushAutosave());
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAutosave(); });
 
@@ -9592,38 +9594,7 @@ body:not([data-app-view="home"]) #undoLastChange:disabled{
 }
 .scope-focus-note{grid-column:1/-1;margin:8px 0 0;color:#fff;font-size:12px;font-weight:800}
 </style>
-<script id="v36-rev-d-focused-scope-script">
-(()=>{
-  'use strict';
-  const scopeMap={scopeInterior:{mode:'interior',target:'interiorGroup'},scopeExterior:{mode:'exterior',target:'exteriorGroup'},scopeStain:{mode:'stain',target:'stainSection'}};
-  function setFocusedScope(inputId,scroll=true){
-    const edit=document.getElementById('edit');
-    const config=scopeMap[inputId];
-    if(!edit||!config)return;
-    edit.dataset.focusedScope=config.mode;
-    document.querySelectorAll('.scope-checks .scope-tile').forEach(tile=>tile.classList.toggle('focused-scope-link',tile.dataset.scopeTile===inputId));
-    const target=document.getElementById(config.target);
-    if(target){
-      target.classList.remove('hide');
-      if(scroll)requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}));
-    }
-  }
-  function prepareFocusedScopes(){
-    const checks=document.querySelector('.scope-checks');
-    if(!checks||checks.dataset.focusedScopeReady==='true')return;
-    checks.dataset.focusedScopeReady='true';
-    checks.insertAdjacentHTML('afterend','<p class="scope-focus-note">Choose a scope to work in. Other scopes stay saved and their items remain in the Shopping List.</p>');
-    checks.querySelectorAll('.scope-tile[data-scope-tile]').forEach(tile=>{
-      const input=tile.querySelector('input');
-      if(!input)return;
-      tile.addEventListener('click',()=>setTimeout(()=>setFocusedScope(input.id,true),0),true);
-      tile.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){setTimeout(()=>setFocusedScope(input.id,true),0);}},true);
-    });
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepareFocusedScopes);else prepareFocusedScopes();
-  new MutationObserver(prepareFocusedScopes).observe(document.documentElement,{childList:true,subtree:true});
-})();
-</script>
+<script id="v36-rev-d-focused-scope-script">/* Disabled in Rev R clean workflow rebuild. */</script>
 
 <style id="v36-rev-e-settings-update-alert-style">
 #settingsUpdateAlert{display:none}
@@ -9723,39 +9694,7 @@ body:not([data-app-view="home"]) textarea::placeholder{color:#ffd4b0!important;o
 .scope-checks .scope-tile{color:#fff!important}
 .scope-checks .scope-tile.rev-f-active-scope{outline:3px solid #ff9a45!important;outline-offset:2px!important;box-shadow:inset 5px 0 0 #ff7416,0 5px 18px #0007!important}
 </style>
-<script id="v36-rev-f-contrast-focused-workflow-script">
-(()=>{
- 'use strict';
- const scopes={scopeInterior:{mode:'interior',target:'interiorGroup',button:'addInteriorArea',label:'+ Add Interior Location'},scopeExterior:{mode:'exterior',target:'exteriorGroup',button:'addExteriorArea',label:'+ Add Elevation'},scopeStain:{mode:'stain',target:'stainSection',button:'addStainArea',label:'+ Add Stain Location'}};
- function relabelAddButtons(){
-   Object.values(scopes).forEach(config=>{const button=document.getElementById(config.button);if(button)button.textContent=config.label;});
- }
- function focusScope(inputId,scroll=true){
-   const config=scopes[inputId],edit=document.getElementById('edit');
-   if(!config||!edit)return;
-   const input=document.getElementById(inputId);
-   if(input&&!input.checked){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}
-   edit.dataset.focusedScope=config.mode;
-   document.querySelectorAll('.scope-checks .scope-tile').forEach(tile=>tile.classList.toggle('rev-f-active-scope',tile.dataset.scopeTile===inputId));
-   Object.values(scopes).forEach(item=>{const section=document.getElementById(item.target);if(section)section.style.display=item.mode===config.mode?'block':'none';});
-   const target=document.getElementById(config.target);
-   if(target){target.classList.remove('hide');if(scroll)requestAnimationFrame(()=>target.scrollIntoView({behavior:'smooth',block:'start'}));}
-   relabelAddButtons();
- }
- function captureScopeSelection(event){
-   const tile=event.target.closest?.('.scope-checks .scope-tile[data-scope-tile]');
-   if(!tile)return;
-   const input=tile.querySelector('input');if(!input||!scopes[input.id])return;
-   event.preventDefault();event.stopImmediatePropagation();focusScope(input.id,true);
- }
- function prepare(){
-   relabelAddButtons();
-   document.addEventListener('click',captureScopeSelection,true);
-   document.addEventListener('keydown',event=>{if(event.key!=='Enter'&&event.key!==' ')return;captureScopeSelection(event);},true);
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',prepare,{once:true});else prepare();
-})();
-</script>
+<script id="v36-rev-f-contrast-focused-workflow-script">/* Disabled in Rev R clean workflow rebuild. */</script>
 
 <style id="v36-rev-g-add-work-area-style">
 /* Selector mode hides workflow sections but preserves their data and the shared shopping list. */
@@ -9768,32 +9707,705 @@ body:not([data-app-view="home"]) textarea::placeholder{color:#ffd4b0!important;o
 .scope-selector-return-note{display:none;margin:8px 0 0;padding:9px 11px;border-radius:10px;background:#3a2417;color:#fff;font-weight:850}
 #edit[data-focused-scope="selector"] .scope-selector-return-note{display:block}
 </style>
-<script id="v36-rev-g-add-work-area-script">
+<script id="v36-rev-g-add-work-area-script">/* Disabled in Rev R clean workflow rebuild. */</script>
+
+<style id="v36-rev-h-authoritative-dark-contrast">
+/* Rev H: authoritative dark-surface contrast correction. */
+body:not([data-app-view="home"]){
+  --dark-primary-text:#ffffff;
+  --dark-secondary-text:#fff0df;
+  --dark-muted-text:#ffd8b5;
+}
+body:not([data-app-view="home"]) :is(
+  .card,.area,.pcard,.order-card,.modalbox,.settings-panel,.scope-group,
+  .workflow-toolbar,.manual-shopping-editor,.integration-sheet,.active-edit-line,
+  .walk-link-sheet,.exterior-workflow-sheet,.order-head,.order-tabs,.order-empty,
+  .completed-filter-box,.storage-protection,.final-review,.review-section
+){color:var(--dark-primary-text)!important}
+body:not([data-app-view="home"]) :is(
+  .card,.area,.pcard,.order-card,.modalbox,.settings-panel,.scope-group,
+  .workflow-toolbar,.manual-shopping-editor,.integration-sheet,.active-edit-line,
+  .walk-link-sheet,.exterior-workflow-sheet,.order-head,.order-tabs,.order-empty,
+  .completed-filter-box,.storage-protection,.final-review,.review-section
+) :is(label,p,span,small,li,legend,dt,dd){color:var(--dark-secondary-text)!important}
+body:not([data-app-view="home"]) :is(
+  .muted,.activity-meta,.order-meta,.order-project,.order-number,
+  .setting-row span,.settings-kicker,.field small,.scope-head small,
+  .compact-order-line small,.quick-label,.active-edit-note
+){color:var(--dark-muted-text)!important}
+body:not([data-app-view="home"]) :is(h1,h2,h3,h4,h5,h6,strong,b){
+  color:var(--dark-primary-text)!important;
+}
+body:not([data-app-view="home"]) :is(
+  .btn,.ghost,.light,.secondary,.primary,.danger,.order-tab,.quick-tile,
+  .scope-head,.final-review-toggle,.review-action,.walk-search-result,
+  .completed-filter-choices button,#undoLastChange,[data-add-work-area]
+){color:#fff!important;text-shadow:none!important}
+body:not([data-app-view="home"]) :is(input,select,textarea){
+  background:#101114!important;color:#fff!important;border-color:#a76535!important;
+  -webkit-text-fill-color:#fff!important;caret-color:#fff!important;
+}
+body:not([data-app-view="home"]) :is(input,textarea)::placeholder{
+  color:#ffd8b5!important;-webkit-text-fill-color:#ffd8b5!important;opacity:1!important;
+}
+body:not([data-app-view="home"]) select option{background:#101114!important;color:#fff!important}
+body:not([data-app-view="home"]) :is(button,.btn,a,[role="button"],[role="link"]):disabled{
+  color:#f4e6dc!important;-webkit-text-fill-color:#f4e6dc!important;opacity:1!important;
+}
+/* Keep validation and success messaging bright enough without losing meaning. */
+body:not([data-app-view="home"]) :is(.quick-validation-error,.required-missing,.scope-tile-warning){color:#fff!important}
+body:not([data-app-view="home"]) :is(.quick-validation-error,.required-missing){background:#681f18!important;border-color:#ff9c8d!important}
+body:not([data-app-view="home"]) .scope-tile-warning{background:#6b1d1d!important;border-color:#ff9b9b!important}
+/* Explicit repair for the controls reported as unreadable. */
+body:not([data-app-view="home"]) #undoLastChange,
+body:not([data-app-view="home"]) #undoLastChange *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+</style>
+
+<style id="v36-rev-i-adaptive-contrast">
+/* Rev I: pair text color with the actual surface color instead of using one global text color. */
+/* Explicit light surfaces use dark ink. */
+body:not([data-app-view="home"]) :is(
+  .summary,.summary-body,.summary-block,.metric,.review-action,.review-total-scope span,
+  .walk-search-result,.walk-selected,.identity-confirm,.quick-walk-note,
+  .active-edit-note,.update-result,.scope-start-note,.help-placeholder,
+  .room-wall-card,.whole-house-toolbar,.final-review-body,
+  .manual-addition-row,.manual-shopping-card,.order-empty
+){color:#17212b!important}
+body:not([data-app-view="home"]) :is(
+  .summary,.summary-body,.summary-block,.metric,.review-action,.review-total-scope span,
+  .walk-search-result,.walk-selected,.identity-confirm,.quick-walk-note,
+  .active-edit-note,.update-result,.scope-start-note,.help-placeholder,
+  .room-wall-card,.whole-house-toolbar,.final-review-body,
+  .manual-addition-row,.manual-shopping-card,.order-empty
+) :is(label,p,span,small,li,strong,b,h1,h2,h3,h4,h5,h6){color:#17212b!important}
+/* Preserve meaningful darker accent text on pale status surfaces. */
+body:not([data-app-view="home"]) :is(.walk-selected,.identity-confirm,.review-live-note) :is(b,strong,h3){color:#155936!important}
+body:not([data-app-view="home"]) :is(.quick-walk-note,.active-edit-note,.scope-start-note,.help-placeholder) :is(b,strong,h3,h4){color:#174f70!important}
+/* Pale buttons/chips need dark labels; selected/dark buttons remain white. */
+body:not([data-app-view="home"]) :is(
+  .quick-tile:not(.selected),.order-tab:not(.active),.completed-filter-choices button,
+  .walk-search-result,.review-action,.final-review-toggle
+){color:#17212b!important;-webkit-text-fill-color:#17212b!important;text-shadow:none!important}
+body:not([data-app-view="home"]) :is(
+  .quick-tile.selected,.order-tab.active,.primary,.danger,.order-sell,
+  [data-add-work-area],#undoLastChange
+){color:#fff!important;-webkit-text-fill-color:#fff!important}
+/* Scope selector tiles use their pale category backgrounds, so their labels must be dark. */
+body:not([data-app-view="home"]) .scope-checks .scope-tile,
+body:not([data-app-view="home"]) .scope-checks .scope-tile span{
+  color:#17212b!important;-webkit-text-fill-color:#17212b!important
+}
+body:not([data-app-view="home"]) .scope-checks .scope-tile.scope-tile-warning,
+body:not([data-app-view="home"]) .scope-checks .scope-tile.scope-tile-warning span{
+  color:#fff!important;-webkit-text-fill-color:#fff!important
+}
+/* Native light autofill must use dark ink; regular dark inputs remain bright. */
+body:not([data-app-view="home"]) input:-webkit-autofill,
+body:not([data-app-view="home"]) textarea:-webkit-autofill,
+body:not([data-app-view="home"]) select:-webkit-autofill{
+  -webkit-text-fill-color:#17212b!important;box-shadow:0 0 0 1000px #fff inset!important
+}
+/* Update alert intentionally remains bright text on its dark banner. */
+#settingsPanelUpdateAlert,#settingsPanelUpdateAlert *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+</style>
+
+<style id="v36-rev-j-authoritative-workflow-style">
+/* Rev J: authoritative single-scope workflow. */
+#edit[data-workflow-view="selector"] #interiorGroup,
+#edit[data-workflow-view="selector"] #exteriorGroup,
+#edit[data-workflow-view="selector"] #stainSection{display:none!important}
+#edit[data-workflow-view="interior"] #interiorGroup{display:block!important}
+#edit[data-workflow-view="interior"] #exteriorGroup,
+#edit[data-workflow-view="interior"] #stainSection{display:none!important}
+#edit[data-workflow-view="exterior"] #exteriorGroup{display:block!important}
+#edit[data-workflow-view="exterior"] #interiorGroup,
+#edit[data-workflow-view="exterior"] #stainSection{display:none!important}
+#edit[data-workflow-view="stain"] #stainSection{display:block!important}
+#edit[data-workflow-view="stain"] #interiorGroup,
+#edit[data-workflow-view="stain"] #exteriorGroup{display:none!important}
+#edit[data-workflow-view="selector"] .scope-start-note{display:block!important}
+</style>
+<script id="v36-rev-j-authoritative-workflow-script">/* Disabled in Rev R clean workflow rebuild. */</script>
+
+<style id="v36-rev-k-workflow-lockup-fix-style">
+#edit[data-workflow-view="selector"] #interiorGroup,
+#edit[data-workflow-view="selector"] #exteriorGroup,
+#edit[data-workflow-view="selector"] #stainSection{display:none!important}
+#edit[data-workflow-view="interior"] #interiorGroup{display:block!important}
+#edit[data-workflow-view="interior"] #exteriorGroup,
+#edit[data-workflow-view="interior"] #stainSection{display:none!important}
+#edit[data-workflow-view="exterior"] #exteriorGroup{display:block!important}
+#edit[data-workflow-view="exterior"] #interiorGroup,
+#edit[data-workflow-view="exterior"] #stainSection{display:none!important}
+#edit[data-workflow-view="stain"] #stainSection{display:block!important}
+#edit[data-workflow-view="stain"] #interiorGroup,
+#edit[data-workflow-view="stain"] #exteriorGroup{display:none!important}
+</style>
+<script id="v36-rev-k-workflow-lockup-fix-script">/* Disabled in Rev R clean workflow rebuild. */</script>
+
+<style id="v36-rev-l-button-contrast-fix">
+/* Rev L: final button-state contrast rules. Placed last so legacy rules cannot override them. */
+body:not([data-app-view="home"]) button,
+body:not([data-app-view="home"]) .btn{
+  text-shadow:none!important;
+}
+/* Dark button families always use bright labels in every interaction state. */
+body:not([data-app-view="home"]) :is(
+  button.ghost,button.light,button.secondary,button.danger,button.primary,
+  .btn.ghost,.btn.light,.btn.secondary,.btn.danger,.btn.primary,
+  #undoLastChange,[data-add-work-area],.order-sell,.scope-head
+),
+body:not([data-app-view="home"]) :is(
+  button.ghost,button.light,button.secondary,button.danger,button.primary,
+  .btn.ghost,.btn.light,.btn.secondary,.btn.danger,.btn.primary,
+  #undoLastChange,[data-add-work-area],.order-sell,.scope-head
+) *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+/* Disabled dark buttons remain visibly disabled without becoming dark-on-dark. */
+body:not([data-app-view="home"]) #undoLastChange:disabled,
+body:not([data-app-view="home"]) #undoLastChange[disabled],
+body:not([data-app-view="home"]) :is(button,.btn):disabled:is(.ghost,.light,.secondary,.danger,.primary),
+body:not([data-app-view="home"]) :is(button,.btn)[disabled]:is(.ghost,.light,.secondary,.danger,.primary){
+  background:#3f352f!important;
+  border-color:#a97755!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+  filter:none!important;
+  cursor:not-allowed!important;
+}
+body:not([data-app-view="home"]) #undoLastChange:disabled *,
+body:not([data-app-view="home"]) #undoLastChange[disabled] *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+}
+/* Keep genuinely light buttons paired with dark text. */
+body:not([data-app-view="home"]) :is(
+  .quick-tile:not(.selected),.order-tab:not(.active),.completed-filter-choices button,
+  .walk-search-result,.review-action,.final-review-toggle
+){
+  color:#17212b!important;
+  -webkit-text-fill-color:#17212b!important;
+}
+/* Selected states are dark/strong surfaces and therefore always use white. */
+body:not([data-app-view="home"]) :is(
+  .quick-tile.selected,.order-tab.active,.completed-filter-choices button:hover,
+  .completed-filter-choices button:focus-visible
+),
+body:not([data-app-view="home"]) :is(
+  .quick-tile.selected,.order-tab.active,.completed-filter-choices button:hover,
+  .completed-filter-choices button:focus-visible
+) *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+</style>
+
+<style id="v36-rev-m-scope-router-style">
+/* Body-level state survives project-screen redraws and overrides the legacy all-sections workflow. */
+body[data-project-scope-view="selector"] #edit #interiorGroup,
+body[data-project-scope-view="selector"] #edit #exteriorGroup,
+body[data-project-scope-view="selector"] #edit #stainSection{display:none!important}
+body[data-project-scope-view="selector"] #edit .scope-checks,
+body[data-project-scope-view="selector"] #edit .scope-start-note,
+body[data-project-scope-view="selector"] #edit .scope-selector-return-note{display:grid!important}
+body[data-project-scope-view="interior"] #edit #interiorGroup{display:block!important}
+body[data-project-scope-view="interior"] #edit #exteriorGroup,
+body[data-project-scope-view="interior"] #edit #stainSection{display:none!important}
+body[data-project-scope-view="exterior"] #edit #exteriorGroup{display:block!important}
+body[data-project-scope-view="exterior"] #edit #interiorGroup,
+body[data-project-scope-view="exterior"] #edit #stainSection{display:none!important}
+body[data-project-scope-view="stain"] #edit #stainSection{display:block!important}
+body[data-project-scope-view="stain"] #edit #interiorGroup,
+body[data-project-scope-view="stain"] #edit #exteriorGroup{display:none!important}
+/* Once a scope is open, remove the original three scope buttons from the workflow itself. */
+body[data-project-scope-view="interior"] #edit .scope-checks,
+body[data-project-scope-view="exterior"] #edit .scope-checks,
+body[data-project-scope-view="stain"] #edit .scope-checks,
+body[data-project-scope-view="interior"] #edit .scope-start-note,
+body[data-project-scope-view="exterior"] #edit .scope-start-note,
+body[data-project-scope-view="stain"] #edit .scope-start-note,
+body[data-project-scope-view="interior"] #edit .scope-selector-return-note,
+body[data-project-scope-view="exterior"] #edit .scope-selector-return-note,
+body[data-project-scope-view="stain"] #edit .scope-selector-return-note{display:none!important}
+.scope-router-return{display:flex!important;justify-content:flex-end!important;margin:0 0 12px!important}
+.scope-router-return button{background:#3a2417!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:2px solid #ff8a31!important;min-height:44px!important;font-weight:900!important}
+</style>
+<script id="v36-rev-m-scope-router-script">/* Disabled in Rev R clean workflow rebuild. */</script>
+
+<style id="v36-rev-n-light-orange-contrast">
+/* Rev N: pale/light-orange surfaces use dark brown ink; strong/dark orange remains white. */
+body:not([data-app-view="home"]) :is(
+  .scope-tile-interior,.scope-tile-exterior,.scope-tile-stain,
+  .manual-addition-badge,.manual-label,.sell-gate-note,
+  .recommended-chip,.summary-chip
+),
+body:not([data-app-view="home"]) :is(
+  .scope-tile-interior,.scope-tile-exterior,.scope-tile-stain,
+  .manual-addition-badge,.manual-label,.sell-gate-note,
+  .recommended-chip,.summary-chip
+) *{
+  color:#3a2417!important;
+  -webkit-text-fill-color:#3a2417!important;
+  text-shadow:none!important;
+}
+/* Any unselected light-orange/tan button gets dark text. */
+body:not([data-app-view="home"]) :is(
+  button.light-orange,.btn.light-orange,
+  button.orange-light,.btn.orange-light,
+  button[style*="background:#ffb"],button[style*="background: #ffb"],
+  button[style*="background:#ffc"],button[style*="background: #ffc"],
+  button[style*="background:#ffd"],button[style*="background: #ffd"],
+  button[style*="background:#ffe"],button[style*="background: #ffe"]
+),
+body:not([data-app-view="home"]) :is(
+  button.light-orange,.btn.light-orange,
+  button.orange-light,.btn.orange-light,
+  button[style*="background:#ffb"],button[style*="background: #ffb"],
+  button[style*="background:#ffc"],button[style*="background: #ffc"],
+  button[style*="background:#ffd"],button[style*="background: #ffd"],
+  button[style*="background:#ffe"],button[style*="background: #ffe"]
+) *{
+  color:#3a2417!important;
+  -webkit-text-fill-color:#3a2417!important;
+}
+/* Selected or intentionally strong orange controls stay white. */
+body:not([data-app-view="home"]) :is(
+  .primary,.danger,.order-sell,.quick-tile.selected,.order-tab.active,
+  [data-add-work-area],[data-return-scope-selector]
+),
+body:not([data-app-view="home"]) :is(
+  .primary,.danger,.order-sell,.quick-tile.selected,.order-tab.active,
+  [data-add-work-area],[data-return-scope-selector]
+) *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+</style>
+
+<style id="v36-rev-o-light-surface-contrast">
+/* Rev O rule: every known light/pastel surface uses near-black text. */
+body:not([data-app-view="home"]) :is(
+  .summary-interior,.summary-exterior,.summary-stain,
+  .scope-tile-interior,.scope-tile-exterior,.scope-tile-stain,
+  .room-wall-card,.whole-house-toolbar,.active-edit-note,.quick-walk-note,
+  .identity-confirm,.walk-selected,.review-live-note,.scope-start-note,
+  .help-placeholder,.manual-addition-row,.manual-shopping-card,
+  .completed-filter-box,.update-result,.storage-protection,
+  .final-review-body,.review-action,.review-total-scope span,
+  .metric,.summary-chip,.recommended-chip,.manual-addition-badge,.manual-label
+),
+body:not([data-app-view="home"]) :is(
+  .summary-interior,.summary-exterior,.summary-stain,
+  .scope-tile-interior,.scope-tile-exterior,.scope-tile-stain,
+  .room-wall-card,.whole-house-toolbar,.active-edit-note,.quick-walk-note,
+  .identity-confirm,.walk-selected,.review-live-note,.scope-start-note,
+  .help-placeholder,.manual-addition-row,.manual-shopping-card,
+  .completed-filter-box,.update-result,.storage-protection,
+  .final-review-body,.review-action,.review-total-scope span,
+  .metric,.summary-chip,.recommended-chip,.manual-addition-badge,.manual-label
+) *{
+  color:#111!important;
+  -webkit-text-fill-color:#111!important;
+  text-shadow:none!important;
+}
+/* Specifically cover pale purple/lavender UI. */
+body:not([data-app-view="home"]) :is(
+  .summary-interior,.interior-wall-finish-card,.interior-touch-up-card,
+  .scope-tile-interior,[class*="purple"],[class*="lavender"]
+),
+body:not([data-app-view="home"]) :is(
+  .summary-interior,.interior-wall-finish-card,.interior-touch-up-card,
+  .scope-tile-interior,[class*="purple"],[class*="lavender"]
+) *{
+  color:#111!important;
+  -webkit-text-fill-color:#111!important;
+}
+/* Strong selected/dark controls still require white. */
+body:not([data-app-view="home"]) :is(
+  .primary,.danger,.order-sell,.quick-tile.selected,.order-tab.active,
+  [data-add-work-area],[data-return-scope-selector],#undoLastChange
+),
+body:not([data-app-view="home"]) :is(
+  .primary,.danger,.order-sell,.quick-tile.selected,.order-tab.active,
+  [data-add-work-area],[data-return-scope-selector],#undoLastChange
+) *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+}
+</style>
+
+<style id="v36-rev-p-single-click-style">
+/* Extra pale-purple coverage plus runtime-detected light surfaces. */
+body:not([data-app-view="home"]) :is(
+ .interior-wall-finish-card,.interior-wall-finish-card .optional-card-header,
+ .interior-wall-finish-card .optional-card-body,.interior-touch-up-card,
+ .interior-touch-up-card .optional-card-header,.interior-touch-up-card .optional-card-body,
+ .touch-up-control,.touch-up-fields,.summary-interior,.summary-interior .metric,
+ .scope-tile-interior,[data-light-surface="true"]
+),
+body:not([data-app-view="home"]) :is(
+ .interior-wall-finish-card,.interior-wall-finish-card .optional-card-header,
+ .interior-wall-finish-card .optional-card-body,.interior-touch-up-card,
+ .interior-touch-up-card .optional-card-header,.interior-touch-up-card .optional-card-body,
+ .touch-up-control,.touch-up-fields,.summary-interior,.summary-interior .metric,
+ .scope-tile-interior,[data-light-surface="true"]
+) :is(span,small,label,p,b,strong,h1,h2,h3,h4,h5,h6){color:#111!important;-webkit-text-fill-color:#111!important;text-shadow:none!important}
+/* True three-button selector. Original checkboxes remain hidden as data storage only. */
+#edit .scope-checks.scope-button-router{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important}
+#edit .scope-checks.scope-button-router>.scope-router-inputs{display:none!important}
+#edit .scope-route-button{min-height:54px!important;padding:11px 13px!important;border:2px solid #a88bc9!important;border-radius:13px!important;background:#ede9fe!important;color:#111!important;-webkit-text-fill-color:#111!important;font-weight:950!important;cursor:pointer!important}
+#edit .scope-route-button[data-route="exterior"]{background:#dbeafe!important;border-color:#8dbcf0!important}
+#edit .scope-route-button[data-route="stain"]{background:#f3e3cc!important;border-color:#d3ad7d!important}
+#edit .scope-route-button[aria-pressed="true"]{outline:4px solid #ff7416!important;outline-offset:2px!important;box-shadow:0 6px 18px #0005!important}
+body[data-project-scope-view="selector"] #edit :is(#interiorGroup,#exteriorGroup,#stainSection){display:none!important}
+body[data-project-scope-view="interior"] #edit #interiorGroup{display:block!important}
+body[data-project-scope-view="interior"] #edit :is(#exteriorGroup,#stainSection){display:none!important}
+body[data-project-scope-view="exterior"] #edit #exteriorGroup{display:block!important}
+body[data-project-scope-view="exterior"] #edit :is(#interiorGroup,#stainSection){display:none!important}
+body[data-project-scope-view="stain"] #edit #stainSection{display:block!important}
+body[data-project-scope-view="stain"] #edit :is(#interiorGroup,#exteriorGroup){display:none!important}
+body[data-project-scope-view]:not([data-project-scope-view="selector"]) #edit .scope-checks{display:none!important}
+@media(max-width:560px){#edit .scope-checks.scope-button-router{grid-template-columns:1fr!important}}
+</style>
+<script id="v36-rev-p-single-click-script">/* Disabled in Rev R clean workflow rebuild. */</script>
+
+<style id="v36-rev-q-work-area-and-purple-fix">
+/* Screenshot-targeted fix: the pale purple Interior header and cards must use dark text. */
+body:not([data-app-view="home"]) #interiorGroup .scope-head,
+body:not([data-app-view="home"]) #interiorGroup .scope-head *,
+body:not([data-app-view="home"]) #interiorGroup .area-head,
+body:not([data-app-view="home"]) #interiorGroup .area-head *,
+body:not([data-app-view="home"]) #interiorGroup .room-head,
+body:not([data-app-view="home"]) #interiorGroup .room-head *,
+body:not([data-app-view="home"]) #interiorGroup .optional-card-header,
+body:not([data-app-view="home"]) #interiorGroup .optional-card-header *,
+body:not([data-app-view="home"]) #interiorGroup .summary-interior,
+body:not([data-app-view="home"]) #interiorGroup .summary-interior *{
+  color:#111!important;
+  -webkit-text-fill-color:#111!important;
+  text-shadow:none!important;
+}
+/* Inside an active scope there is one navigation control only: Add Another Work Area. */
+body[data-project-scope-view]:not([data-project-scope-view="selector"]) #edit .scope-checks,
+body[data-project-scope-view]:not([data-project-scope-view="selector"]) #edit .scope-start-note,
+body[data-project-scope-view]:not([data-project-scope-view="selector"]) #edit .scope-selector-return-note{display:none!important}
+body[data-project-scope-view]:not([data-project-scope-view="selector"]) #edit .scope-router-return{display:flex!important;justify-content:flex-end!important;margin:12px 0!important}
+body[data-project-scope-view]:not([data-project-scope-view="selector"]) #edit .scope-router-return button{
+  background:#3a2417!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+  border:2px solid #ff7416!important;min-height:48px!important;padding:10px 18px!important;
+  border-radius:13px!important;font-weight:950!important
+}
+/* Selector is visible only after New Project or Add Another Work Area. */
+body[data-project-scope-view="selector"] #edit .scope-checks.scope-button-router{display:grid!important}
+body[data-project-scope-view="selector"] #edit :is(#interiorGroup,#exteriorGroup,#stainSection){display:none!important}
+</style>
+<script id="v36-rev-q-work-area-and-purple-script">/* Disabled in Rev R clean workflow rebuild. */</script>
+
+<style id="v36-rev-r-clean-workflow-style">
+/* One source of truth: body data-workflow-mode. */
+body[data-workflow-mode="choose"] #edit #interiorGroup,
+body[data-workflow-mode="choose"] #edit #exteriorGroup,
+body[data-workflow-mode="choose"] #edit #stainSection{display:none!important}
+body[data-workflow-mode="interior"] #edit #interiorGroup{display:block!important}
+body[data-workflow-mode="interior"] #edit #exteriorGroup,
+body[data-workflow-mode="interior"] #edit #stainSection{display:none!important}
+body[data-workflow-mode="exterior"] #edit #exteriorGroup{display:block!important}
+body[data-workflow-mode="exterior"] #edit #interiorGroup,
+body[data-workflow-mode="exterior"] #edit #stainSection{display:none!important}
+body[data-workflow-mode="stain"] #edit #stainSection{display:block!important}
+body[data-workflow-mode="stain"] #edit #interiorGroup,
+body[data-workflow-mode="stain"] #edit #exteriorGroup{display:none!important}
+body[data-workflow-mode="choose"] #edit .scope-checks{display:grid!important}
+body[data-workflow-mode]:not([data-workflow-mode="choose"]) #edit .scope-checks{display:none!important}
+body[data-workflow-mode]:not([data-workflow-mode="choose"]) #edit .scope-start-note{display:none!important}
+.rev-r-work-area-button{display:flex!important;justify-content:flex-end!important;margin:12px 0!important}
+.rev-r-work-area-button button{background:#3a2417!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:2px solid #ff7416!important;border-radius:13px!important;min-height:48px!important;padding:10px 18px!important;font-weight:950!important}
+/* Screenshot-specific pale purple header repair. */
+#interiorGroup .scope-head,#interiorGroup .scope-head *{color:#111!important;-webkit-text-fill-color:#111!important;text-shadow:none!important}
+</style>
+<script id="v36-rev-r-clean-workflow-script">/* Disabled in Rev S: replaced by the main scope prompt. */</script>
+
+<style id="v36-rev-s-main-scope-prompt-style">
+/* Remove Work Included from the project form completely. */
+#edit .field:has(>.scope-checks),#edit .scope-start-note,#edit .scope-selector-return-note{display:none!important}
+/* One active work section at a time. */
+body[data-workflow-mode="none"] #edit :is(#interiorGroup,#exteriorGroup,#stainSection),
+body[data-workflow-mode="prompt"] #edit :is(#interiorGroup,#exteriorGroup,#stainSection){display:none!important}
+body[data-workflow-mode="interior"] #edit #interiorGroup{display:block!important}
+body[data-workflow-mode="interior"] #edit :is(#exteriorGroup,#stainSection){display:none!important}
+body[data-workflow-mode="exterior"] #edit #exteriorGroup{display:block!important}
+body[data-workflow-mode="exterior"] #edit :is(#interiorGroup,#stainSection){display:none!important}
+body[data-workflow-mode="stain"] #edit #stainSection{display:block!important}
+body[data-workflow-mode="stain"] #edit :is(#interiorGroup,#exteriorGroup){display:none!important}
+/* Shared prompt used both at New Project start and Add Another Work Area. */
+#revSScopePrompt{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:18px;background:#08090be8}
+#revSScopePrompt.hide{display:none!important}
+.rev-s-prompt-card{width:min(720px,100%);padding:22px;border:2px solid #8f542c;border-radius:22px;background:#191a1d;color:#fff;box-shadow:0 26px 80px #000b}
+.rev-s-prompt-card h2{margin:0;color:#fff!important}.rev-s-prompt-card p{margin:7px 0 18px;color:#ffe8d2!important}
+.rev-s-prompt-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rev-s-prompt-option{min-height:94px;padding:14px;border:2px solid;border-radius:15px;color:#111!important;-webkit-text-fill-color:#111!important;font-weight:950;font-size:17px;cursor:pointer}
+.rev-s-prompt-option[data-scope="interior"]{background:#ede9fe;border-color:#9f7aea}
+.rev-s-prompt-option[data-scope="exterior"]{background:#dbeafe;border-color:#6aa8e8}
+.rev-s-prompt-option[data-scope="stain"]{background:#f3e3cc;border-color:#cd9b61}
+.rev-s-prompt-option:hover,.rev-s-prompt-option:focus-visible{outline:4px solid #ff7416;outline-offset:2px;transform:translateY(-1px)}
+.rev-s-prompt-cancel{display:block;margin:16px 0 0 auto;background:#3a2417!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:2px solid #ff7416!important}
+.rev-s-add-work{display:flex;justify-content:flex-end;margin:12px 0}.rev-s-add-work button{min-height:48px;padding:10px 18px;border:2px solid #ff7416;border-radius:13px;background:#3a2417;color:#fff;-webkit-text-fill-color:#fff;font-weight:950}
+#interiorGroup .scope-head,#interiorGroup .scope-head *{color:#111!important;-webkit-text-fill-color:#111!important;text-shadow:none!important}
+@media(max-width:600px){.rev-s-prompt-options{grid-template-columns:1fr}.rev-s-prompt-option{min-height:66px}}
+</style>
+<script id="v36-rev-s-main-scope-prompt-script">/* Disabled in Rev T: New Project now uses the app native scope launcher. */</script>
+
+<style id="v36-rev-t-native-linking-style">
+#revSScopePrompt{display:none!important}
+/* Work Included remains removed from the form. */
+#edit .field:has(>.scope-checks),#edit .scope-start-note,#edit .scope-selector-return-note{display:none!important}
+body[data-workflow-mode="interior"] #edit #interiorGroup{display:block!important}
+body[data-workflow-mode="interior"] #edit :is(#exteriorGroup,#stainSection){display:none!important}
+body[data-workflow-mode="exterior"] #edit #exteriorGroup{display:block!important}
+body[data-workflow-mode="exterior"] #edit :is(#interiorGroup,#stainSection){display:none!important}
+body[data-workflow-mode="stain"] #edit #stainSection{display:block!important}
+body[data-workflow-mode="stain"] #edit :is(#interiorGroup,#exteriorGroup){display:none!important}
+#revTAddPrompt{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:18px;background:#08090be8}
+#revTAddPrompt.hide{display:none!important}
+.rev-t-card{width:min(720px,100%);padding:22px;border:2px solid #8f542c;border-radius:22px;background:#191a1d;color:#fff;box-shadow:0 26px 80px #000b}
+.rev-t-card h2{margin:0;color:#fff!important}.rev-t-card p{color:#ffe8d2!important}
+.rev-t-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.rev-t-options button{min-height:86px;border:2px solid;border-radius:15px;color:#111!important;-webkit-text-fill-color:#111!important;font-weight:950;font-size:17px}
+.rev-t-options [data-add-scope="scopeInterior"]{background:#ede9fe;border-color:#9f7aea}.rev-t-options [data-add-scope="scopeExterior"]{background:#dbeafe;border-color:#6aa8e8}.rev-t-options [data-add-scope="scopeStain"]{background:#f3e3cc;border-color:#cd9b61}
+.rev-t-cancel{display:block;margin:14px 0 0 auto;background:#3a2417!important;color:#fff!important;border:2px solid #ff7416!important}
+.rev-t-add-button{display:flex;justify-content:flex-end;margin:12px 0}.rev-t-add-button button{min-height:48px;padding:10px 18px;border:2px solid #ff7416;border-radius:13px;background:#3a2417;color:#fff;-webkit-text-fill-color:#fff;font-weight:950}
+@media(max-width:600px){.rev-t-options{grid-template-columns:1fr}}
+</style>
+
+<script id="v36-rev-w-early-exterior-popup-bridge">
 (()=>{
  'use strict';
- const sections=['interiorGroup','exteriorGroup','stainSection'];
- function selector(){return document.querySelector('#edit .scope-checks');}
- function showScopeSelector(){
-   const edit=document.getElementById('edit');if(!edit)return;
-   edit.dataset.focusedScope='selector';
-   sections.forEach(id=>{const section=document.getElementById(id);if(section)section.style.display='none';});
-   document.querySelectorAll('.scope-checks .scope-tile').forEach(tile=>tile.classList.remove('rev-f-active-scope','focused-scope-link'));
-   const target=selector();
-   if(target){target.scrollIntoView({behavior:'smooth',block:'center'});const first=target.querySelector('.scope-tile');setTimeout(()=>first?.focus(),300);}
+ let addingExterior=false;
+ function showExteriorChoice(){
+   addingExterior=true;
+   document.getElementById('revTAddPrompt')?.classList.add('hide');
+   const launcher=document.getElementById('exteriorWorkflowLauncher');
+   if(!launcher)return;
+   launcher.classList.remove('hide');
+   document.body.classList.add('smart-modal-open');
+   launcher.querySelector('[data-exterior-workflow]')?.focus();
  }
- function install(){
-   const labels={interiorGroup:'Interior',exteriorGroup:'Exterior Paint',stainSection:'Exterior Stain'};
-   sections.forEach(id=>{
-     const section=document.getElementById(id);if(!section||section.querySelector('.add-work-area-nav'))return;
-     const anchor=section.querySelector('.scope-body')||section;
-     anchor.insertAdjacentHTML('afterbegin',`<div class="add-work-area-nav"><button type="button" class="btn" data-add-work-area aria-label="Add another work area to this project">+ Add Another Work Area</button></div>`);
-   });
-   const checks=selector();
-   if(checks&&!document.querySelector('.scope-selector-return-note'))checks.insertAdjacentHTML('afterend','<p class="scope-selector-return-note">Choose Interior, Exterior Paint, or Exterior Stain. Existing work and the Shopping List stay with this project.</p>');
+ function finishExterior(mode){
+   document.getElementById('exteriorWorkflowLauncher')?.classList.add('hide');
+   document.body.classList.remove('smart-modal-open');
+   const input=document.getElementById('scopeExterior');
+   if(input&&!input.checked){input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));}
+   if(typeof cur!=='undefined'&&cur){
+     cur.scopeExterior=true;
+     cur.exteriorWorkflow=mode;
+     if(typeof ensureScopeAreas==='function')ensureScopeAreas('scopeExterior');
+     const elevation=(cur.areas||[]).find(item=>typeof isExteriorPaintElevation==='function'&&isExteriorPaintElevation(item));
+     if(elevation&&mode==='wholeHouse'){
+       elevation.name='Whole House';elevation.walls=[0,0,0,0];elevation.wallAxes=['length','width','length','width'];elevation.bumpOut=false;
+     }
+     if(typeof fill==='function')fill();
+     if(typeof renderExteriorWorkflowMode==='function')renderExteriorWorkflowMode();
+     if(typeof mark==='function')mark();
+   }
+   document.body.dataset.workflowMode='exterior';
+   const group=document.getElementById('exteriorGroup');
+   group?.classList.remove('hide','collapsed');
+   requestAnimationFrame(()=>group?.scrollIntoView({behavior:'smooth',block:'start'}));
+   addingExterior=false;
  }
- document.addEventListener('click',event=>{const button=event.target.closest?.('[data-add-work-area]');if(!button)return;event.preventDefault();event.stopImmediatePropagation();showScopeSelector();},true);
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
- new MutationObserver(install).observe(document.documentElement,{childList:true,subtree:true});
+ document.addEventListener('click',event=>{
+   const addExterior=event.target.closest?.('#revTAddPrompt [data-add-scope="scopeExterior"]');
+   if(addExterior){event.preventDefault();event.stopImmediatePropagation();showExteriorChoice();return;}
+   const workflow=event.target.closest?.('#exteriorWorkflowLauncher [data-exterior-workflow]');
+   if(workflow&&addingExterior){event.preventDefault();event.stopImmediatePropagation();finishExterior(workflow.dataset.exteriorWorkflow);return;}
+   const back=event.target.closest?.('#cancelExteriorWorkflow');
+   if(back&&addingExterior){event.preventDefault();event.stopImmediatePropagation();document.getElementById('exteriorWorkflowLauncher')?.classList.add('hide');document.getElementById('revTAddPrompt')?.classList.remove('hide');addingExterior=false;}
+ },true);
 })();
 </script>
+<script id="v36-rev-t-native-linking-script">
+(()=>{
+ 'use strict';
+ const routes={scopeInterior:{mode:'interior',section:'interiorGroup'},scopeExterior:{mode:'exterior',section:'exteriorGroup'},scopeStain:{mode:'stain',section:'stainSection'}};
+ function install(){
+  if(!document.getElementById('revTAddPrompt'))document.body.insertAdjacentHTML('beforeend',`<div id="revTAddPrompt" class="hide" role="dialog" aria-modal="true"><div class="rev-t-card"><h2>Add Another Work Area</h2><p>Choose the next workflow. Existing work stays in this project and Shopping List.</p><div class="rev-t-options"><button type="button" data-add-scope="scopeInterior">Interior</button><button type="button" data-add-scope="scopeExterior">Exterior Paint</button><button type="button" data-add-scope="scopeStain">Exterior Stain</button></div><button type="button" class="btn rev-t-cancel" data-rev-t-cancel>Cancel</button></div></div>`);
+  Object.values(routes).forEach(route=>{const sec=document.getElementById(route.section);if(!sec)return;sec.querySelectorAll('.add-work-area-nav,.scope-router-return,.rev-r-work-area-button,.rev-s-add-work').forEach(n=>n.remove());if(sec.querySelector('.rev-t-add-button'))return;const anchor=sec.querySelector('.scope-body')||sec;anchor.insertAdjacentHTML('afterbegin','<div class="rev-t-add-button"><button type="button" data-rev-t-add>+ Add Another Work Area</button></div>');});
+ }
+ function showMode(mode){document.body.dataset.workflowMode=mode;const route=Object.values(routes).find(r=>r.mode===mode);requestAnimationFrame(()=>{const section=document.getElementById(route?.section);section?.classList.remove('hide','collapsed');section?.scrollIntoView({behavior:'smooth',block:'start'});});}
+ function addScope(key){const route=routes[key],input=document.getElementById(key);if(!route||!input)return;input.checked=true;input.dispatchEvent(new Event('change',{bubbles:true}));document.getElementById('revTAddPrompt')?.classList.add('hide');setTimeout(()=>showMode(route.mode),0);setTimeout(()=>showMode(route.mode),120);}
+ document.addEventListener('click',e=>{
+  const native=e.target.closest?.('#scopeLauncher [data-launch-scope]');if(native){const r=routes[native.dataset.launchScope];if(r)setTimeout(()=>showMode(r.mode),80);return;}
+  const add=e.target.closest?.('[data-rev-t-add]');if(add){e.preventDefault();e.stopImmediatePropagation();document.getElementById('revTAddPrompt')?.classList.remove('hide');return;}
+  const choice=e.target.closest?.('[data-add-scope]');if(choice){e.preventDefault();e.stopImmediatePropagation();addScope(choice.dataset.addScope);return;}
+  if(e.target.closest?.('[data-rev-t-cancel]')){e.preventDefault();document.getElementById('revTAddPrompt')?.classList.add('hide');}
+ },true);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',install,{once:true});else install();
+})();
+</script>
+
+<script id="v36-rev-v-exterior-add-workflow-choice">/* Disabled in Rev W: handler moved ahead of the Add Work Area controller for correct interception. */</script>
+
+<style id="v36-rev-x-exterior-popup-contrast">
+/* Rev X: restore crisp contrast in the shared Exterior workflow popup. */
+#exteriorWorkflowLauncher .exterior-workflow-sheet{
+  background:#191a1d!important;
+  color:#fff!important;
+}
+#exteriorWorkflowLauncher .exterior-workflow-head,
+#exteriorWorkflowLauncher .exterior-workflow-head h2,
+#exteriorWorkflowLauncher .exterior-workflow-head span{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+#exteriorWorkflowLauncher .exterior-workflow-head p{
+  color:#ffe8d2!important;
+  -webkit-text-fill-color:#ffe8d2!important;
+  opacity:1!important;
+}
+/* Choice cards are light surfaces, so all card copy is near-black. */
+#exteriorWorkflowLauncher .exterior-workflow-card,
+#exteriorWorkflowLauncher .exterior-workflow-card *{
+  color:#111!important;
+  -webkit-text-fill-color:#111!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+#exteriorWorkflowLauncher .exterior-workflow-card{
+  background:#f7f2ea!important;
+  border:2px solid #b57a4c!important;
+}
+#exteriorWorkflowLauncher .exterior-workflow-card.recommended{
+  background:#fff0d2!important;
+  border-color:#ff8a31!important;
+}
+#exteriorWorkflowLauncher .recommended-chip{
+  background:#8a3f0d!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border-color:#8a3f0d!important;
+}
+#exteriorWorkflowLauncher #cancelExteriorWorkflow,
+#exteriorWorkflowLauncher #cancelExteriorWorkflow *{
+  background:#3a2417!important;
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  border-color:#ff8a31!important;
+  opacity:1!important;
+}
+</style>
+
+<style id="v36-rev-y-order-center-contrast">
+/* Screenshot-targeted Order Center contrast repair. */
+#orderCenterIntegration,
+#orderCenterIntegration .order-center-shell{color:#17212b!important}
+/* Light surfaces always use dark text. */
+#orderCenterIntegration :is(
+ .order-head,.order-tabs,.order-stats,.order-stat,.order-card,.order-empty,
+ .order-line,.order-line-body,.order-card-head,.order-card-body,
+ .completed-filter-box,.walk-link-sheet,.active-edit-line
+),
+#orderCenterIntegration :is(
+ .order-head,.order-tabs,.order-stats,.order-stat,.order-card,.order-empty,
+ .order-line,.order-line-body,.order-card-head,.order-card-body,
+ .completed-filter-box,.walk-link-sheet,.active-edit-line
+) :is(h1,h2,h3,h4,h5,h6,p,span,small,b,strong,label,li,div){
+ color:#17212b!important;-webkit-text-fill-color:#17212b!important;opacity:1!important;text-shadow:none!important
+}
+/* Header helper text shown washed out in the screenshot. */
+#orderCenterIntegration :is(.order-kicker,.order-subtitle,.order-meta,.order-project,.order-number,.order-line-meta,.order-status-text){
+ color:#5b341b!important;-webkit-text-fill-color:#5b341b!important;opacity:1!important
+}
+/* Count tiles are pale blue and require dark ink. */
+#orderCenterIntegration .order-stat,
+#orderCenterIntegration .order-stat *{color:#17212b!important;-webkit-text-fill-color:#17212b!important;opacity:1!important}
+/* Tabs: light inactive tabs use dark text; strong active tab uses white. */
+#orderCenterIntegration .order-tab:not(.active),
+#orderCenterIntegration .order-tab:not(.active) *{color:#17212b!important;-webkit-text-fill-color:#17212b!important;opacity:1!important}
+#orderCenterIntegration .order-tab.active,
+#orderCenterIntegration .order-tab.active *{color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}
+/* Dark and strong action buttons use white. */
+#orderCenterIntegration :is(.primary,.danger,.order-sell,[data-order-submit],[data-quick-order]),
+#orderCenterIntegration :is(.primary,.danger,.order-sell,[data-order-submit],[data-quick-order]) *{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important
+}
+/* Pale action buttons use dark text, including disabled Edit/Change Walk. */
+#orderCenterIntegration :is(.ghost,.light,.secondary):not(.primary):not(.danger),
+#orderCenterIntegration :is(.ghost,.light,.secondary):not(.primary):not(.danger) *{
+ color:#17212b!important;-webkit-text-fill-color:#17212b!important;text-shadow:none!important
+}
+#orderCenterIntegration button:disabled,
+#orderCenterIntegration .btn:disabled{
+ opacity:1!important;filter:none!important
+}
+#orderCenterIntegration button:disabled:not(.primary):not(.danger):not(.order-sell),
+#orderCenterIntegration .btn:disabled:not(.primary):not(.danger):not(.order-sell){
+ background:#e3e7ea!important;color:#34414c!important;-webkit-text-fill-color:#34414c!important;border-color:#aeb8bf!important
+}
+/* Quantity badge and product line need solid contrast. */
+#orderCenterIntegration :is(.order-qty,.line-qty,.quantity-badge){
+ background:#e6f0f7!important;color:#8a3f0d!important;-webkit-text-fill-color:#8a3f0d!important;opacity:1!important
+}
+#orderCenterIntegration :is(.order-qty,.line-qty,.quantity-badge) *{color:#8a3f0d!important;-webkit-text-fill-color:#8a3f0d!important}
+/* Quick Order is a strong orange control. */
+#orderCenterIntegration :is(#quickOrder,[data-quick-order],.quick-order-button),
+#orderCenterIntegration :is(#quickOrder,[data-quick-order],.quick-order-button) *{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important
+}
+</style>
+
+<style id="v36-rev-z-previous-projects-contrast">
+/* Screenshot-targeted Previous Projects contrast repair. */
+#find{color:#fff!important}
+#find :is(h1,h2,h3,h4,p,label,span,small){opacity:1!important;text-shadow:none!important}
+/* Dark project cards and search field use bright text. */
+#find .pcard,
+#find .pcard *{color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;text-shadow:none!important}
+#find #q{background:#101114!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border-color:#a85b2a!important;caret-color:#fff!important}
+#find #q::placeholder{color:#ffd8b5!important;-webkit-text-fill-color:#ffd8b5!important;opacity:1!important}
+/* Strong brown/orange actions use white. */
+#find :is(#go,.project-orders-button),
+#find :is(#go,.project-orders-button) *{background:#ad4c13!important;color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important}
+/* Pale cream actions use dark ink, including New and Clone. */
+#find :is(#new2,.clone-list-button),
+#find :is(#new2,.clone-list-button) *{background:#fff0d2!important;color:#3a2417!important;-webkit-text-fill-color:#3a2417!important;border-color:#c18a55!important;opacity:1!important;text-shadow:none!important}
+#find :is(#new2,.clone-list-button):disabled{background:#eadbc2!important;color:#5a3b27!important;-webkit-text-fill-color:#5a3b27!important;opacity:1!important;filter:none!important}
+/* Preserve readable borders and separation between project rows. */
+#find .project-list-item{border-color:#6f3a1b!important}
+</style>
+
+<style id="v36-rev-aa-order-queue-summary-contrast">
+/* Rev AA: exact repair for the pale-blue Active/Waiting summary tiles. */
+#orderCenterIntegration #orderQueueSummary,
+#orderCenterIntegration .order-queue-summary{
+  color:#17212b!important;
+}
+#orderCenterIntegration #orderQueueSummary>span,
+#orderCenterIntegration .order-queue-summary>span{
+  background:#e6f0f7!important;
+  color:#17212b!important;
+  -webkit-text-fill-color:#17212b!important;
+  opacity:1!important;
+  text-shadow:none!important;
+  border-color:#b8cad8!important;
+}
+#orderCenterIntegration #orderQueueSummary>span b,
+#orderCenterIntegration .order-queue-summary>span b{
+  color:#17212b!important;
+  -webkit-text-fill-color:#17212b!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+/* Strong orange actions remain white. */
+#orderCenterIntegration :is(#quickOrderIntegration,[data-order-action="submit"],.order-submit),
+#orderCenterIntegration :is(#quickOrderIntegration,[data-order-action="submit"],.order-submit) *{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+}
+</style>
 </body></html>
