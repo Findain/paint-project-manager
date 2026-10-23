@@ -10408,4 +10408,48 @@ body[data-workflow-mode="stain"] #edit :is(#interiorGroup,#exteriorGroup){displa
   opacity:1!important;
 }
 </style>
+
+<style id="v36-rev-aa-install-prompt-maintenance">
+#ppmInstallPrompt{position:fixed;inset:0;z-index:2147483645;display:grid;place-items:center;padding:18px;background:#08090be8}
+#ppmInstallPrompt.hide{display:none!important}
+.ppm-install-card{width:min(560px,100%);padding:22px;border:2px solid #9b572c;border-radius:20px;background:#191a1d;color:#fff;box-shadow:0 24px 80px #000b}
+.ppm-install-card h2{margin:0 0 8px;color:#fff!important}.ppm-install-card p{margin:0 0 18px;color:#ffe8d2!important;line-height:1.45}
+.ppm-install-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}.ppm-install-actions button{min-height:46px;padding:10px 18px;border-radius:12px;font-weight:900}
+#ppmInstallNow{background:#ad4c13!important;color:#fff!important;-webkit-text-fill-color:#fff!important;border:2px solid #ff8a31!important}
+#ppmInstallLater{background:#fff0d2!important;color:#3a2417!important;-webkit-text-fill-color:#3a2417!important;border:2px solid #c18a55!important}
+</style>
+<script id="v36-rev-aa-install-prompt-maintenance-script">
+(()=>{
+ 'use strict';
+ let installEvent=null;
+ const installed=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+ function ensurePrompt(){
+   if(document.getElementById('ppmInstallPrompt'))return;
+   document.body.insertAdjacentHTML('beforeend','<div id="ppmInstallPrompt" class="hide" role="dialog" aria-modal="true" aria-labelledby="ppmInstallTitle"><div class="ppm-install-card"><h2 id="ppmInstallTitle">Install Paint Project Manager?</h2><p>Add the app to this device for faster access and an app-style launch.</p><div class="ppm-install-actions"><button type="button" id="ppmInstallLater">Not now</button><button type="button" id="ppmInstallNow">Install App</button></div></div></div>');
+   document.getElementById('ppmInstallLater').addEventListener('click',()=>document.getElementById('ppmInstallPrompt').classList.add('hide'));
+   document.getElementById('ppmInstallNow').addEventListener('click',async()=>{
+     if(!installEvent)return;
+     const event=installEvent;installEvent=null;
+     await event.prompt();
+     await event.userChoice;
+     document.getElementById('ppmInstallPrompt').classList.add('hide');
+   });
+ }
+ function showPrompt(){if(installed()||!installEvent)return;ensurePrompt();document.getElementById('ppmInstallPrompt').classList.remove('hide')}
+ /* Capture before the legacy listener, but do not suppress browser installability. */
+ window.addEventListener('beforeinstallprompt',event=>{
+   event.preventDefault();installEvent=event;
+   const legacy=document.getElementById('installApp');legacy?.classList.remove('hide');
+   setTimeout(showPrompt,650);
+ },true);
+ window.addEventListener('appinstalled',()=>{
+   installEvent=null;document.getElementById('ppmInstallPrompt')?.classList.add('hide');document.getElementById('installApp')?.classList.add('hide');
+ });
+ document.addEventListener('click',event=>{
+   const button=event.target.closest?.('#installApp');
+   if(button&&installEvent){event.preventDefault();event.stopImmediatePropagation();showPrompt();}
+ },true);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensurePrompt,{once:true});else ensurePrompt();
+})();
+</script>
 </body></html>
