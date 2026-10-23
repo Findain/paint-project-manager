@@ -9237,7 +9237,10 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
     }
     function activeOrderEditorLine(line,index){
         const value=normalizeEditableOrderLine(line);
-        return `<section class="active-edit-line" data-active-edit-line="${index}"><div class="active-edit-line-head"><b>Line ${index+1}</b><button type="button" class="btn danger" data-active-delete-line="${index}">Delete Line</button></div><div class="active-edit-grid"><label>Product<input data-active-line-field="product" value="${integrationEsc(value.product)}"></label><label>Finish<input data-active-line-field="finish" value="${integrationEsc(value.finish)}"></label><label>Color<input data-active-line-field="color" value="${integrationEsc(value.color)}"></label><label>Quantity<input data-active-line-field="qty" type="number" min="1" step="1" value="${value.qty}"></label><label class="active-edit-notes">Notes<input data-active-line-field="notes" value="${integrationEsc(value.notes)}"></label></div></section>`;
+        const products=[...new Set(Object.values(ORDER_CATALOG).flatMap(group=>Object.keys(group)))].sort();
+        const finishes=[...new Set(Object.values(ORDER_CATALOG).flatMap(group=>Object.values(group)).flat())].sort();
+        const optionList=(items,current)=>[current,...items].filter((item,pos,all)=>item&&all.indexOf(item)===pos).map(item=>`<option value="${integrationEsc(item)}"${item===current?' selected':''}>${integrationEsc(item)}</option>`).join('');
+        return `<section class="active-edit-line" data-active-edit-line="${index}"><div class="active-edit-line-head"><b>Line ${index+1}</b><button type="button" class="btn danger" data-active-delete-line="${index}">Delete Line</button></div><div class="active-edit-grid"><label>Product<select data-active-line-field="product">${optionList(products,value.product)}</select></label><label>Finish<select data-active-line-field="finish">${optionList(finishes,value.finish)}</select></label><label>Color<input data-active-line-field="color" value="${integrationEsc(value.color)}" placeholder="Type color name or number"></label><label>Quantity<select data-active-line-field="qty">${[1,2,3,4,5,6,7,8,9,10,12,15,20].map(q=>`<option value="${q}"${Number(value.qty)===q?' selected':''}>${q}</option>`).join('')}</select></label><label class="active-edit-notes">Notes<input data-active-line-field="notes" value="${integrationEsc(value.notes)}"></label></div></section>`;
     }
     function openActiveOrderEditor(orderId){
         const order=orderState.active.find(item=>item.id===orderId);
@@ -9291,7 +9294,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
         $('#qoWalkResults').onclick=e=>{const result=e.target.closest('[data-walk-id]');if(!result)return;const linked=walks.find(p=>String(p.id)===result.dataset.walkId);if(!linked)return;selectedWalkId=String(linked.id);$('#qoCustomer').value=linked.customer||'';$('#qoPhone').value=linked.phone||'';$('#qoWalkSelected').innerHTML=`<b>${integrationEsc(linked.customer||'Untitled')}</b><span>${integrationEsc(linked.address||'')} ${integrationEsc(linked.city||'')}</span><small>Linked walk</small>`;$('#qoWalkSelected').classList.remove('hide');$('#qoClearWalk').classList.remove('hide');$('#qoWalkResults').classList.add('hide');$('#qoWalkSearch').value='';$('#qoCustomer').classList.remove('required-missing');$('#qoPhone').classList.remove('required-missing')};
         $('#qoClearWalk').onclick=()=>{selectedWalkId='';$('#qoWalkSelected').classList.add('hide');$('#qoWalkSelected').innerHTML='';$('#qoClearWalk').classList.add('hide');$('#qoWalkSearch').value='';$('#qoWalkSearch').focus()};
         const state=()=>({customer:$('#qoCustomer')?.value||'',phone:$('#qoPhone')?.value||'',walk:selectedWalkId,color:$('#qoColor')?.value||'',notes:$('#qoNotes')?.value||'',custom:$('#qoCustomQty')?.value||'1'});
-        $('#integrationModal').onclick=e=>{if(e.target.id==='integrationModal')return e.currentTarget.remove();const tile=e.target.closest('[data-quick-key]');if(!tile)return;const v=state();quickPick[tile.dataset.quickKey]=tile.dataset.quickKey==='qty'&&tile.dataset.quickValue!=='Custom'?Number(tile.dataset.quickValue):tile.dataset.quickValue;openQuickOrder();$('#qoCustomer').value=v.customer;$('#qoPhone').value=v.phone;$('#qoColor').value=v.color;$('#qoNotes').value=v.notes;if($('#qoCustomQty'))$('#qoCustomQty').value=v.custom;if(v.walk){const linked=walks.find(p=>String(p.id)===v.walk);if(linked){$('#qoWalkSearch').value=linked.customer||linked.address||'';$('#qoWalkSearch').dispatchEvent(new Event('input'));setTimeout(()=>document.querySelector(`[data-walk-id="${CSS.escape(v.walk)}"]`)?.click(),0)}}};
+        $('#integrationModal').onclick=e=>{if(e.target.id==='integrationModal')return e.currentTarget.remove();const tile=e.target.closest('[data-quick-key]');if(!tile)return;const v=state();quickPick[tile.dataset.quickKey]=tile.dataset.quickKey==='qty'&&tile.dataset.quickValue!=='Custom'?Number(tile.dataset.quickValue):tile.dataset.quickValue;const quickSheet=e.currentTarget.querySelector('.integration-sheet');const quickScrollTop=quickSheet?quickSheet.scrollTop:0;openQuickOrder();const refreshedQuickSheet=document.querySelector('#integrationModal .integration-sheet');if(refreshedQuickSheet){refreshedQuickSheet.scrollTop=quickScrollTop;requestAnimationFrame(()=>{refreshedQuickSheet.scrollTop=quickScrollTop;});}$('#qoCustomer').value=v.customer;$('#qoPhone').value=v.phone;$('#qoColor').value=v.color;$('#qoNotes').value=v.notes;if($('#qoCustomQty'))$('#qoCustomQty').value=v.custom;if(v.walk){const linked=walks.find(p=>String(p.id)===v.walk);if(linked){$('#qoWalkSearch').value=linked.customer||linked.address||'';$('#qoWalkSearch').dispatchEvent(new Event('input'));setTimeout(()=>document.querySelector(`[data-walk-id="${CSS.escape(v.walk)}"]`)?.click(),0)}}};
         $('#addQuickToCart').onclick=()=>{const customer=$('#qoCustomer').value.trim(),phone=$('#qoPhone').value.trim();if(!validIdentity(customer,phone,{name:$('#qoCustomer'),phone:$('#qoPhone'),error:$('#qoValidationError')}))return;const linked=walks.find(p=>String(p.id)===selectedWalkId),qty=quickPick.qty==='Custom'?Math.max(1,parseInt($('#qoCustomQty').value,10)||1):Number(quickPick.qty);orderState.active.unshift({id:`O${Date.now()}`,number:orderState.next++,type:'Quick Order',customer,phone,project:linked?(linked.address||linked.customer):($('#qoNotes').value.trim()||'Standalone Quick Order'),walkId:linked?.id||'',walkName:linked?(linked.customer||linked.address||'Linked Walk'):'',created:new Date().toISOString(),lines:[{id:`L${Date.now()}`,qty,originalQty:qty,title:`${quickPick.product} · ${quickPick.finish}`,detail:`${$('#qoColor').value.trim()||'Color not entered'} · ${quickPick.container}${$('#qoNotes').value.trim()?' · '+$('#qoNotes').value.trim():''}`}]});$('#integrationModal').remove();saveOrderState();openOrderCenter();toast(linked?'Quick Order linked to walk':'Standalone Quick Order added')};
     }
     function openReorder(order){
@@ -9557,4 +9560,40 @@ if ('serviceWorker' in navigator) {
  el('checkUpdates')?.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();setStatus('Checking live release…');el('updateResult')?.classList.add('hide');try{reg=reg||await navigator.serviceWorker.getRegistration();if(!reg)throw new Error('No registration');await reg.update();await new Promise(r=>setTimeout(r,1000));reg.waiting?showReady():setStatus('Current release loaded')}catch(x){setStatus(navigator.onLine?'Unable to check for updates':'Offline · try again when connected')}},true);
  el('updateNow')?.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();if(!reg)reg=await navigator.serviceWorker.getRegistration();if(reg?.waiting){el('updateNow').disabled=true;el('updateNow').textContent='Applying…';reg.waiting.postMessage({type:'SKIP_WAITING'})}else{setStatus('Checking again…');await reg?.update();setTimeout(()=>reg?.waiting?showReady():setStatus('Current release loaded'),1000)}},true);
 })();
-</script></body></html>
+</script>
+<style id="v36-rev-c-ux-patch">
+/* Quick Order redraw protection and guided Active Cart editing */
+#integrationModal .integration-sheet{overflow-anchor:auto!important;scroll-behavior:auto!important}
+.active-edit-grid select,.active-edit-grid input{width:100%;box-sizing:border-box;margin-top:4px;padding:11px;border:1px solid #9f7455;border-radius:9px;background:#101114;color:#fff;font:inherit}
+/* Thanksgiving contrast correction for Undo Last Change */
+#undoLastChange{background:#3a2417!important;color:#fff4e8!important;border:2px solid #ff8a31!important;text-shadow:none!important}
+#undoLastChange:disabled{background:#342b25!important;color:#e8d8c9!important;border-color:#8b6448!important;opacity:1!important}
+/* Work Included is navigation, not a checkbox presentation. Existing inputs remain as state storage. */
+.scope-checks{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important}
+.scope-checks .scope-tile{display:flex!important;align-items:center!important;justify-content:space-between!important;min-height:48px!important;cursor:pointer!important;text-decoration:none!important}
+.scope-checks .scope-tile input{position:absolute!important;opacity:0!important;pointer-events:none!important}
+.scope-checks .scope-tile span:after{content:'  ›';font-size:20px;font-weight:950}
+@media(max-width:520px){.scope-checks{grid-template-columns:1fr!important}}
+</style>
+<script id="v36-rev-c-ux-patch-script">
+(()=>{
+  'use strict';
+  function upgradeScopeLinks(){
+    const map={scopeInterior:'interiorGroup',scopeExterior:'exteriorGroup',scopeStain:'stainSection'};
+    document.querySelectorAll('.scope-checks .scope-tile[data-scope-tile]').forEach(tile=>{
+      if(tile.dataset.linkReady==='true')return;
+      tile.dataset.linkReady='true'; tile.setAttribute('role','link'); tile.setAttribute('tabindex','0');
+      const openScope=()=>{
+        const input=tile.querySelector('input'); if(!input)return;
+        if(!input.checked){input.click();}
+        requestAnimationFrame(()=>{const target=document.getElementById(map[input.id]); if(target){target.classList.remove('hide');target.scrollIntoView({behavior:'smooth',block:'start'});}});
+      };
+      tile.addEventListener('click',e=>{if(e.target.tagName==='INPUT')return;e.preventDefault();openScope();});
+      tile.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openScope();}});
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',upgradeScopeLinks);else upgradeScopeLinks();
+  new MutationObserver(upgradeScopeLinks).observe(document.documentElement,{childList:true,subtree:true});
+})();
+</script>
+</body></html>
