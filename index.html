@@ -9285,13 +9285,15 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
             completedFilterBox.classList.remove('hide');
             const input=$('#completedLiveFilter'); if(input&&input.value!==completedFilter)input.value=completedFilter;
             const choices=$('#completedFilterChoices');
-            const prefix=completedFilter.trim().toLowerCase();
-            const matches=prefix?completedNames.filter(name=>name.toLowerCase().startsWith(prefix)).slice(0,10):[];
+            const prefix=completedFilter.trim().toLowerCase(),filterTokens=prefix.split(/\s+/).filter(Boolean);
+            const completedSearchText=order=>{const flatten=value=>value==null?'':Array.isArray(value)?value.map(flatten).join(' '):typeof value==='object'?Object.values(value).map(flatten).join(' '):String(value);return flatten(order).toLowerCase()};
+            const matchingOrders=prefix?completedRecent.filter(order=>{const text=completedSearchText(order);return filterTokens.every(token=>text.includes(token))}):[];
+            const matches=[...new Set(matchingOrders.map(order=>String(order.customer||order.project||'').trim()).filter(Boolean))].slice(0,10);
             if(choices)choices.innerHTML=matches.map(name=>`<button type="button" data-completed-filter-choice="${integrationEsc(name)}">${integrationEsc(name)}</button>`).join('');
             if(input&&!input.dataset.bound){input.dataset.bound='true';input.addEventListener('input',event=>{completedFilter=event.target.value;renderOrderCenter()});}
             choices?.querySelectorAll('[data-completed-filter-choice]').forEach(button=>button.onclick=()=>{completedFilter=button.dataset.completedFilterChoice;renderOrderCenter()});
         }else completedFilterBox?.classList.add('hide');
-        const rows=orderTab==='staged' ? completedRecent.filter(order=>!completedFilter.trim()||String(order.customer||order.project||'').toLowerCase().startsWith(completedFilter.trim().toLowerCase())) : orderState[orderTab];
+        const rows=orderTab==='staged' ? completedRecent.filter(order=>{const tokens=completedFilter.trim().toLowerCase().split(/\s+/).filter(Boolean);if(!tokens.length)return true;const flatten=value=>value==null?'':Array.isArray(value)?value.map(flatten).join(' '):typeof value==='object'?Object.values(value).map(flatten).join(' '):String(value);const text=flatten(order).toLowerCase();return tokens.every(token=>text.includes(token))}) : orderState[orderTab];
         const actionLabel=orderTab==='active'?'SUBMIT TO MIX':orderTab==='waiting'?'COMPLETED':'REORDER';
         const actionName=orderTab==='active'?'submit':orderTab==='waiting'?'stage':'reorder';
         list.innerHTML=rows.length?rows.map(o=>`<article class="order-card compact-order"><div class="order-card-head"><div><h3>${integrationEsc(o.customer||'Name not entered')}</h3><div class="order-phone">${integrationEsc(o.phone||'Phone not entered')}</div><div class="order-project">${integrationEsc(o.project||'Quick Order')}</div></div><span class="order-number">Order #${o.number}</span></div><div class="order-meta">${integrationEsc(o.type)}${o.walkId?' · Linked to '+integrationEsc(o.walkName||o.project||'walk'):' · Not linked'}</div>${o.lines.map(l=>`<div class="compact-order-line ${orderTab==='waiting'&&l.mixed?'mix-line-complete':''}" ${orderTab==='waiting'?`role="button" tabindex="0" data-mix-order="${o.id}" data-mix-line="${l.id}" aria-pressed="${l.mixed?'true':'false'}"`:''}><div class="order-qty">${l.qty}</div><div><b>${integrationEsc(l.title)}</b><small>${integrationEsc(l.detail)}</small></div>${orderTab==='waiting'?'<span class="mix-check">✓</span>':''}</div>`).join('')}<div class="order-card-actions">${orderTab==='waiting' ? `<button class="btn primary order-primary-action" data-order-action="stage" data-order-id="${o.id}">COMPLETED</button>` : orderTab==='active' ? `<button class="btn secondary active-order-edit" data-active-order-edit="${o.id}">EDIT ORDER</button><button class="btn secondary order-link-action" data-order-link="${o.id}">${o.walkId?'CHANGE WALK':'LINK TO WALK'}</button><button class="btn primary order-primary-action" data-order-action="submit" data-order-id="${o.id}">SUBMIT TO MIX</button>` : `<button class="btn secondary order-link-action" data-order-link="${o.id}">${o.walkId?'CHANGE WALK':'LINK TO WALK'}</button><button class="btn primary order-primary-action" data-order-action="reorder" data-order-id="${o.id}">REORDER</button>`}</div></article>`).join(''):`<div class="order-empty"><b>No ${orderTab==='active'?'active':orderTab} orders</b><span>Use Quick Order or sell product from a quoted walk.</span></div>`;
@@ -9373,7 +9375,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
         const products=Object.keys(ORDER_CATALOG[quickPick.category]);if(!products.includes(quickPick.product))quickPick.product=products[0];
         const finishes=ORDER_CATALOG[quickPick.category][quickPick.product];if(!finishes.includes(quickPick.finish))quickPick.finish=finishes[0];
         const walks=[...db].filter(project=>hasProjectIdentity(project));let selectedWalkId='';
-        openIntegrationModal('Quick Order',`<div id="qoValidationError" class="quick-validation-error hide"></div><div class="quick-identity"><label>Customer / Pro Name <b>*</b><input id="qoCustomer" autocomplete="name"></label><label>Phone Number <b>*</b><input id="qoPhone" type="tel" autocomplete="tel"></label></div><div class="walk-search-box"><label>Link Existing Walk <small>Optional</small><input id="qoWalkSearch" placeholder="Start typing owner, contractor, address, city, ZIP, or phone..."></label><button type="button" class="btn ghost hide" id="qoClearWalk">Clear Link</button><div id="qoWalkSelected" class="walk-selected hide"></div><div id="qoWalkResults" class="walk-search-results hide"></div></div><p class="quick-walk-note">Linking is optional. Select a matching walk to categorize this Quick Order under that house, or leave the search blank for a standalone Quick Order.</p><label class="quick-label">Category</label>${tileGroup('qoCategoryTiles',categories,'category')}<label class="quick-label">Product</label>${tileGroup('qoProductTiles',products,'product')}<label class="quick-label">Finish / Sheen / Opacity</label>${tileGroup('qoFinishTiles',finishes,'finish')}<label class="quick-label">Container</label>${tileGroup('qoContainerTiles',['Single Gallon','5-Gallon Pail'],'container')}<label class="quick-label">Quantity</label>${tileGroup('qoQtyTiles',[1,2,3,4,5,10,'Custom'],'qty')}<input id="qoCustomQty" class="field ${quickPick.qty==='Custom'?'':'hide'}" type="number" min="1" value="1"><div class="quick-identity quick-details"><label>Color Name / Number<input id="qoColor"></label><label>Order Note / Area<input id="qoNotes" placeholder="Primer, cabinet paint, patched wall..."></label></div><div id="qoDraftLines" class="quick-multi-lines"></div><button type="button" class="btn secondary order-primary-action" id="addQuickColorLine">+ Add Another Color</button><button class="btn primary order-primary-action" id="addQuickToCart">Add Quick Order to Active Cart</button>`);
+        openIntegrationModal('Quick Order',`<div id="qoValidationError" class="quick-validation-error hide"></div><div class="quick-identity"><label>Customer / Pro Name <b>*</b><input id="qoCustomer" autocomplete="name"></label><label>Phone Number <b>*</b><input id="qoPhone" type="tel" autocomplete="tel"></label></div><div class="walk-search-box"><label>Link Existing Walk <small>Optional</small><input id="qoWalkSearch" class="quick-live-filter-input" autocomplete="off" spellcheck="false" placeholder="Start typing owner, contractor, address, city, ZIP, or phone..."></label><button type="button" class="btn ghost hide" id="qoClearWalk">Clear Link</button><div id="qoWalkSelected" class="walk-selected hide"></div><div id="qoWalkResults" class="walk-search-results hide"></div></div><p class="quick-walk-note">Linking is optional. Select a matching walk to categorize this Quick Order under that house, or leave the search blank for a standalone Quick Order.</p><label class="quick-label">Category</label>${tileGroup('qoCategoryTiles',categories,'category')}<label class="quick-label">Product</label>${tileGroup('qoProductTiles',products,'product')}<label class="quick-label">Finish / Sheen / Opacity</label>${tileGroup('qoFinishTiles',finishes,'finish')}<label class="quick-label">Container</label>${tileGroup('qoContainerTiles',['Single Gallon','5-Gallon Pail'],'container')}<label class="quick-label">Quantity</label>${tileGroup('qoQtyTiles',[1,2,3,4,5,10,'Custom'],'qty')}<input id="qoCustomQty" class="field ${quickPick.qty==='Custom'?'':'hide'}" type="number" min="1" value="1"><div class="quick-identity quick-details"><label>Color Name / Number<input id="qoColor"></label><label>Order Note / Area<input id="qoNotes" placeholder="Primer, cabinet paint, patched wall..."></label></div><div id="qoDraftLines" class="quick-multi-lines"></div><button type="button" class="btn secondary order-primary-action" id="addQuickColorLine">+ Add Another Color</button><button class="btn primary order-primary-action" id="addQuickToCart">Add Quick Order to Active Cart</button>`);
         const renderWalkResults=term=>{const box=$('#qoWalkResults'),q=String(term||'').trim().toLowerCase(),tokens=q.split(/\s+/).filter(Boolean);if(!q){box.classList.add('hide');box.innerHTML='';return}const searchableValue=value=>{if(value==null)return '';if(Array.isArray(value))return value.map(searchableValue).join(' ');if(typeof value==='object')return Object.values(value).map(searchableValue).join(' ');return String(value)};const found=walks.filter(p=>{const haystack=searchableValue(p).toLowerCase(),phoneDigits=String(p.phone||'').replace(/\D/g,'');return tokens.every(token=>{const tokenDigits=token.replace(/\D/g,'');return haystack.includes(token)||(tokenDigits.length>=3&&phoneDigits.includes(tokenDigits))})}).slice(0,12);box.innerHTML=found.length?found.map(p=>`<button type="button" class="walk-search-result" data-walk-id="${integrationEsc(p.id)}"><b>${integrationEsc(p.customer||'Untitled')}</b><span>${integrationEsc(p.address||'')} ${integrationEsc(p.city||'')} ${integrationEsc(p.zip||'')}</span><small>${integrationEsc(p.phone||'')}</small></button>`).join(''):'<p>No matching walks.</p>';box.classList.remove('hide')};
         $('#qoWalkSearch').oninput=e=>renderWalkResults(e.target.value);
         $('#qoWalkResults').onclick=e=>{const result=e.target.closest('[data-walk-id]');if(!result)return;const linked=walks.find(p=>String(p.id)===result.dataset.walkId);if(!linked)return;selectedWalkId=String(linked.id);$('#qoCustomer').value=linked.customer||'';$('#qoPhone').value=linked.phone||'';$('#qoWalkSelected').innerHTML=`<b>${integrationEsc(linked.customer||'Untitled')}</b><span>${integrationEsc(linked.address||'')} ${integrationEsc(linked.city||'')}</span><small>Linked walk</small>`;$('#qoWalkSelected').classList.remove('hide');$('#qoClearWalk').classList.remove('hide');$('#qoWalkResults').classList.add('hide');$('#qoWalkSearch').value='';$('#qoCustomer').classList.remove('required-missing');$('#qoPhone').classList.remove('required-missing')};
@@ -11344,5 +11346,58 @@ html body #integrationModal #qoWalkResults .walk-search-result *{
   opacity:1!important;
   text-shadow:none!important;
 }
+</style>
+
+<style id="v38-rev-aa-live-filter-forced-light-text">
+/* Final authority: typed Live Filter text stays light, including browser autofill. */
+html body input#qoWalkSearch.quick-live-filter-input,
+html body input#qoWalkSearch.quick-live-filter-input:hover,
+html body input#qoWalkSearch.quick-live-filter-input:focus,
+html body input#qoWalkSearch.quick-live-filter-input:focus-visible,
+html body input#qoWalkSearch.quick-live-filter-input:active,
+html body input#qoWalkSearch.quick-live-filter-input:valid,
+html body input#qoWalkSearch.quick-live-filter-input:invalid{
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  caret-color:#ffffff!important;
+  background-color:#111317!important;
+  background:#111317!important;
+  opacity:1!important;
+  text-shadow:none!important;
+  color-scheme:dark!important;
+}
+html body input#qoWalkSearch.quick-live-filter-input::placeholder{
+  color:#f4dfc3!important;
+  -webkit-text-fill-color:#f4dfc3!important;
+  opacity:1!important;
+}
+html body input#qoWalkSearch.quick-live-filter-input:-webkit-autofill,
+html body input#qoWalkSearch.quick-live-filter-input:-webkit-autofill:hover,
+html body input#qoWalkSearch.quick-live-filter-input:-webkit-autofill:focus,
+html body input#qoWalkSearch.quick-live-filter-input:-webkit-autofill:active{
+  -webkit-text-fill-color:#ffffff!important;
+  caret-color:#ffffff!important;
+  -webkit-box-shadow:0 0 0 1000px #111317 inset!important;
+  box-shadow:0 0 0 1000px #111317 inset!important;
+  transition:background-color 99999s ease-out 0s!important;
+}
+</style>
+
+<style id="v38-rev-aa-order-center-completed-filter-final-contrast">
+/* Final authority for the actual Order Center > Completed Live Filter shown in the screenshot. */
+html body input#completedLiveFilter,
+html body input#completedLiveFilter:hover,
+html body input#completedLiveFilter:focus,
+html body input#completedLiveFilter:focus-visible,
+html body input#completedLiveFilter:active,
+html body input#completedLiveFilter:valid,
+html body input#completedLiveFilter:invalid{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;caret-color:#fff!important;background:#101114!important;background-color:#101114!important;opacity:1!important;text-shadow:none!important;color-scheme:dark!important;
+}
+html body input#completedLiveFilter::placeholder{color:#f4dfc3!important;-webkit-text-fill-color:#f4dfc3!important;opacity:1!important}
+html body input#completedLiveFilter:-webkit-autofill,
+html body input#completedLiveFilter:-webkit-autofill:hover,
+html body input#completedLiveFilter:-webkit-autofill:focus,
+html body input#completedLiveFilter:-webkit-autofill:active{-webkit-text-fill-color:#fff!important;caret-color:#fff!important;-webkit-box-shadow:0 0 0 1000px #101114 inset!important;box-shadow:0 0 0 1000px #101114 inset!important}
 </style>
 </body></html>
