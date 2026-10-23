@@ -10644,39 +10644,70 @@ body:not([data-app-view="home"]) #undoLastChange[disabled]{
 </style>
 
 <style id="v36-rev-aa-exterior-light-header-final-contrast">
-/* Rev AA maintenance: every light-blue Exterior Paint surface uses dark ink. */
-#exteriorGroup .scope-head,
-#exteriorGroup .scope-head:hover,
-#exteriorGroup .scope-head:focus,
-#exteriorGroup .scope-head:focus-visible,
-#exteriorGroup .scope-head:active,
-#exteriorGroup .scope-head[aria-expanded="true"],
-#exteriorGroup .scope-head[aria-expanded="false"],
-#exteriorGroup .scope-head *,
-#exteriorGroup .scope-head:hover *,
-#exteriorGroup .scope-head:focus *,
-#exteriorGroup .scope-head:active *,
-#exteriorGroup .scope-head[aria-expanded="true"] *,
-#exteriorGroup .scope-head[aria-expanded="false"] *{
+/* Rev AA: final-authority contrast for the exact pale-blue Exterior Paint scope header only. */
+#exteriorGroup > #toggleExteriorGroup,
+#exteriorGroup > #toggleExteriorGroup:hover,
+#exteriorGroup > #toggleExteriorGroup:focus,
+#exteriorGroup > #toggleExteriorGroup:focus-visible,
+#exteriorGroup > #toggleExteriorGroup:active,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="true"],
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="false"],
+#exteriorGroup.collapsed > #toggleExteriorGroup,
+#exteriorGroup:not(.collapsed) > #toggleExteriorGroup,
+#exteriorGroup.active > #toggleExteriorGroup,
+#exteriorGroup.highlighted > #toggleExteriorGroup,
+#exteriorGroup.selected > #toggleExteriorGroup,
+#exteriorGroup > #toggleExteriorGroup:disabled,
+#exteriorGroup > #toggleExteriorGroup[disabled]{
+  background:#dbeafe!important;
+  border-color:#60a5fa!important;
   color:#111827!important;
   -webkit-text-fill-color:#111827!important;
   opacity:1!important;
   text-shadow:none!important;
 }
-#exteriorGroup .scope-head{
-  background:#dbeafe!important;
-  border-color:#60a5fa!important;
-}
-/* The visible expand/collapse mark must follow the same dark-on-light rule. */
-#exteriorGroup .scope-head::before,
-#exteriorGroup .scope-head::after{
-  color:#111827!important;
-  -webkit-text-fill-color:#111827!important;
-  opacity:1!important;
-}
-/* Pale-blue elevation rows also stay dark in every state. */
-#exteriorGroup :is(.area-head,.elevation-head,.exterior-elevation-head),
-#exteriorGroup :is(.area-head,.elevation-head,.exterior-elevation-head) *{
+#exteriorGroup > #toggleExteriorGroup > span:first-child,
+#exteriorGroup > #toggleExteriorGroup > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup:hover > span:first-child,
+#exteriorGroup > #toggleExteriorGroup:hover > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup:hover > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup:focus > span:first-child,
+#exteriorGroup > #toggleExteriorGroup:focus > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup:focus > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup:focus-visible > span:first-child,
+#exteriorGroup > #toggleExteriorGroup:focus-visible > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup:focus-visible > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup:active > span:first-child,
+#exteriorGroup > #toggleExteriorGroup:active > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup:active > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="true"] > span:first-child,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="true"] > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="true"] > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="false"] > span:first-child,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="false"] > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup[aria-expanded="false"] > .scope-chevron,
+#exteriorGroup.collapsed > #toggleExteriorGroup > span:first-child,
+#exteriorGroup.collapsed > #toggleExteriorGroup > span:first-child small,
+#exteriorGroup.collapsed > #toggleExteriorGroup > .scope-chevron,
+#exteriorGroup:not(.collapsed) > #toggleExteriorGroup > span:first-child,
+#exteriorGroup:not(.collapsed) > #toggleExteriorGroup > span:first-child small,
+#exteriorGroup:not(.collapsed) > #toggleExteriorGroup > .scope-chevron,
+#exteriorGroup.active > #toggleExteriorGroup > span:first-child,
+#exteriorGroup.active > #toggleExteriorGroup > span:first-child small,
+#exteriorGroup.active > #toggleExteriorGroup > .scope-chevron,
+#exteriorGroup.highlighted > #toggleExteriorGroup > span:first-child,
+#exteriorGroup.highlighted > #toggleExteriorGroup > span:first-child small,
+#exteriorGroup.highlighted > #toggleExteriorGroup > .scope-chevron,
+#exteriorGroup.selected > #toggleExteriorGroup > span:first-child,
+#exteriorGroup.selected > #toggleExteriorGroup > span:first-child small,
+#exteriorGroup.selected > #toggleExteriorGroup > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup:disabled > span:first-child,
+#exteriorGroup > #toggleExteriorGroup:disabled > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup:disabled > .scope-chevron,
+#exteriorGroup > #toggleExteriorGroup[disabled] > span:first-child,
+#exteriorGroup > #toggleExteriorGroup[disabled] > span:first-child small,
+#exteriorGroup > #toggleExteriorGroup[disabled] > .scope-chevron{
   color:#111827!important;
   -webkit-text-fill-color:#111827!important;
   opacity:1!important;
