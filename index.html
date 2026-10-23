@@ -9624,4 +9624,53 @@ body:not([data-app-view="home"]) #undoLastChange:disabled{
   new MutationObserver(prepareFocusedScopes).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>
+
+<style id="v36-rev-e-settings-update-alert-style">
+#settingsUpdateAlert{display:none}
+body[data-app-view="home"] #settingsUpdateAlert.update-ready{
+ display:grid!important;place-items:center!important;position:absolute!important;
+ right:-6px!important;top:-7px!important;min-width:29px!important;height:29px!important;
+ padding:0 7px!important;border:3px solid #fff!important;border-radius:999px!important;
+ background:#e54818!important;color:#fff!important;box-shadow:0 5px 14px #0009!important;
+ z-index:4!important;font:950 16px/1 Arial,sans-serif!important;pointer-events:none!important
+}
+#settingsPanelUpdateAlert{display:none;margin:0 0 12px;padding:11px 13px;border:2px solid #ff8a31;border-radius:12px;background:#3a2417;color:#fff;font-weight:900}
+#settingsPanelUpdateAlert.update-ready{display:flex;align-items:center;gap:9px}
+#settingsPanelUpdateAlert b{display:grid;place-items:center;min-width:25px;height:25px;border-radius:50%;background:#e54818;color:#fff}
+</style>
+<script id="v36-rev-e-settings-update-alert-script">
+(()=>{
+ 'use strict';
+ const readyText=/update ready|ready to activate|new release is downloaded/i;
+ function ensureIndicators(){
+   const settingsRoute=document.querySelector('#v36HomeNavLayer [data-home-route="settings"]');
+   if(settingsRoute&&!document.getElementById('settingsUpdateAlert'))settingsRoute.insertAdjacentHTML('beforeend','<span id="settingsUpdateAlert" aria-hidden="true">!</span>');
+   const updateCard=document.getElementById('updateStatus')?.closest('.settings-panel');
+   if(updateCard&&!document.getElementById('settingsPanelUpdateAlert'))updateCard.insertAdjacentHTML('afterbegin','<div id="settingsPanelUpdateAlert" role="status" aria-live="polite"><b>!</b><span>An app update is available and ready to install.</span></div>');
+ }
+ function setUpdateAlert(isReady){
+   ensureIndicators();
+   document.getElementById('settingsUpdateAlert')?.classList.toggle('update-ready',!!isReady);
+   document.getElementById('settingsPanelUpdateAlert')?.classList.toggle('update-ready',!!isReady);
+   const settingsRoute=document.querySelector('#v36HomeNavLayer [data-home-route="settings"]');
+   if(settingsRoute){settingsRoute.setAttribute('aria-label',isReady?'Settings, update available':'Settings');settingsRoute.title=isReady?'Settings · Update available':'Settings';}
+ }
+ function readUpdateState(){
+   const status=document.getElementById('updateStatus')?.textContent||'';
+   const detail=document.getElementById('updateDetail')?.textContent||'';
+   const result=document.getElementById('updateResult');
+   setUpdateAlert(readyText.test(status+' '+detail)&&!result?.classList.contains('hide'));
+ }
+ function bind(){
+   ensureIndicators();readUpdateState();
+   const status=document.getElementById('updateStatus'),detail=document.getElementById('updateDetail'),result=document.getElementById('updateResult');
+   const observer=new MutationObserver(readUpdateState);
+   if(status)observer.observe(status,{childList:true,subtree:true,characterData:true});
+   if(detail)observer.observe(detail,{childList:true,subtree:true,characterData:true});
+   if(result)observer.observe(result,{attributes:true,attributeFilter:['class']});
+   if('serviceWorker' in navigator)navigator.serviceWorker.getRegistration().then(reg=>{if(reg?.waiting)setUpdateAlert(true)}).catch(()=>{});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+</script>
 </body></html>
