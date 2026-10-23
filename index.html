@@ -11158,4 +11158,25 @@ html body #undoLastChange *{
  document.addEventListener('click',event=>{if(event.target.closest?.('[data-home-route="settings"],#settings,#back'))setTimeout(schedule,0)},true);
 })();
 </script>
+
+<style id="v36-rev-aa-backup-controls-final">
+/* Backup & Restore: preserve the real label and hide only the native file input. */
+#back .settings-actions{display:flex!important;flex-wrap:wrap!important;gap:14px!important;align-items:center!important}
+#back .settings-file{
+ position:relative!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-width:210px!important;min-height:64px!important;width:auto!important;padding:14px 22px!important;
+ border:2px solid #ff7416!important;border-radius:17px!important;background:#ffedc9!important;
+ color:#3a2417!important;-webkit-text-fill-color:#3a2417!important;font-size:18px!important;
+ line-height:1.2!important;font-weight:950!important;white-space:nowrap!important;cursor:pointer!important;overflow:hidden!important
+}
+#back .settings-file::before,#back .settings-file::after{content:none!important;display:none!important}
+#back .settings-file input[type="file"]{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important;padding:0!important;
+ opacity:0!important;cursor:pointer!important;font-size:100px!important;background:transparent!important;border:0!important
+}
+#back #exportAll,#back #exportAll *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#back #showReminderPrototype,#back #showReminderPrototype *{color:#17212b!important;-webkit-text-fill-color:#17212b!important}
+#back .settings-panel .setting-row span{color:#f7e7d7!important;-webkit-text-fill-color:#f7e7d7!important}
+#back .settings-panel .setting-row strong{color:#fff!important;-webkit-text-fill-color:#fff!important}
+</style>
 </body></html>
