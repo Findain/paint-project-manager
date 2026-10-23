@@ -1340,7 +1340,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
 </div>
 </div>
 <div aria-hidden="true" class="maintenance-reminder-backdrop hide" id="maintenanceReminderBackdrop"></div><div aria-labelledby="maintenanceTitle" aria-modal="false" class="maintenance-reminder hide" id="maintenanceReminder" role="dialog"><button aria-label="Close reminder" class="reminder-close" id="closeReminder" type="button">×</button><span class="settings-kicker">Friendly Maintenance Reminder</span><h3 id="maintenanceTitle">It's been about 30 days since your last backup.</h3><p>Recommended: Create a backup copy. This is a friendly maintenance reminder and will never block your work.</p><div class="settings-actions"><button class="btn primary" id="backupNow" type="button">Backup Now</button><button class="btn light" id="remindLater" type="button">Remind Me Later</button></div></div>
-</section><section class="hide" id="legal"><div class="card legal-page"><div class="row legal-title-row"><div><h2 class="title">Legal &amp; Privacy</h2><p class="legal-version">Paint Project Manager V3.5.15 · Thanksgiving Edition</p></div><button class="btn light" id="closeLegal" type="button">Back</button></div><div class="legal-grid"><section><h3>Estimate Use</h3><p>Paint Project Manager is an estimating and workflow aid. Calculations, coverage, quantities, product selections, pricing, availability, measurements, job conditions, and order details must be reviewed before use. The app does not replace field verification, product instructions, store procedures, or professional judgment.</p></section><section><h3>Local Data &amp; Privacy</h3><p>Project records are stored on this device. Protect access to the device and exported backup files. Export data before changing devices or clearing browser storage. Do not enter information that is unnecessary for the estimate or order workflow.</p></section><section><h3>No Purchase Processing</h3><p>The app supports estimating, shopping-list, mixing, staging, and reorder workflows. It does not complete payment, purchasing, delivery, warranty, or customer-contract functions.</p></section><section><h3>Trademark Acknowledgments</h3><p>© 2026 Lowe’s. All rights reserved. Lowe’s and the Gable Mansard Design are registered trademarks of LF, LLC. HGTV HOME, Valspar, Sherwin-Williams, and other product or brand names shown in the app remain the property of their respective owners.</p></section></div></div></section><section class="scope-launcher hide" id="scopeLauncher" role="dialog" aria-modal="true" aria-labelledby="scopeLauncherTitle"><div class="scope-launcher-sheet"><div class="scope-launcher-head"><div><span>NEW PROJECT</span><h2 id="scopeLauncherTitle">Choose Work Included</h2><p>Select the workflow that should start this project. Nothing is created or saved until you choose.</p></div><button type="button" class="btn ghost" id="cancelScopeLauncher">Cancel</button></div><div class="scope-launcher-grid"><button type="button" class="scope-launch-card scope-launch-interior" data-launch-scope="scopeInterior"><b>Interior</b><span>Rooms, walls, ceilings, trim, doors, windows, primer, and paint.</span></button><button type="button" class="scope-launch-card scope-launch-exterior" data-launch-scope="scopeExterior"><b>Exterior Paint</b><span>Exterior paint elevations and related finish options.</span></button><button type="button" class="scope-launch-card scope-launch-stain" data-launch-scope="scopeStain"><b>Exterior Stain</b><span>Deck, fence, and stained-siding workflows.</span></button></div><p class="scope-launcher-foot">No autosave · No draft · No recovery copy · No project record until a scope is selected</p></div></section><section class="exterior-workflow-launcher hide" id="exteriorWorkflowLauncher" role="dialog" aria-modal="true" aria-labelledby="exteriorWorkflowTitle"><div class="exterior-workflow-sheet"><div class="exterior-workflow-head"><div><span>EXTERIOR PAINT</span><h2 id="exteriorWorkflowTitle">Choose Workflow</h2><p>Select the entry method that matches the house.</p></div><button type="button" class="btn ghost" id="cancelExteriorWorkflow">Back</button></div><div class="exterior-workflow-grid"><button type="button" class="exterior-workflow-card recommended" data-exterior-workflow="wholeHouse"><div class="recommended-chip">Recommended</div><b>Whole House</b><span>Enter the house wall by wall as one exterior project. Best when product and color are consistent.</span></button><button type="button" class="exterior-workflow-card" data-exterior-workflow="elevations"><b>Elevation by Elevation</b><span>Keep the current workflow for complex structures, multiple products, or multiple colors.</span></button></div></div></section><section class="hide" id="edit"><div class="card"><div class="row"><h2 class="title" id="et">New Project</h2><b aria-live="polite" class="save-status" data-state="unsaved" id="state">Unsaved changes</b></div><div class="fields"><div class="field"><label>Customer / Project</label><input id="customer"/></div><div class="field"><label>Phone</label><input id="phone" type="tel"/></div><div class="field"><label>Visit Date</label><input id="date" type="date"/></div><div class="field span2"><label>Address</label><input id="address"/></div><div class="field span2"><label>Work Included</label><div class="scope-checks"><label class="scope-tile scope-tile-interior" data-scope-tile="scopeInterior"><input id="scopeInterior" type="checkbox"/> <span>Interior</span></label><label class="scope-tile scope-tile-exterior" data-scope-tile="scopeExterior"><input id="scopeExterior" type="checkbox"/> <span>Exterior Paint</span></label><label class="scope-tile scope-tile-stain" data-scope-tile="scopeStain"><input id="scopeStain" type="checkbox"/> <span>Exterior Stain</span></label></div></div><p class="scope-start-note" id="v36ScopeStartNote">Choose a Work Included scope to start the project. Customer information alone will not create a draft or start autosave.</p><div class="compact-row address-row span3"><div class="field city-field"><label>City</label><input autocomplete="address-level2" id="city"/></div><div class="field state-field"><label>State</label><input autocomplete="address-level1" id="st" maxlength="2" value="OR"/></div><div class="field zip-field"><label>ZIP</label><input autocomplete="postal-code" id="zip" inputmode="numeric"/></div></div><div class="field"><label>Purchase Strategy</label><select id="quartMode"><option selected="" value="bucket">Gallons + 5 Gallon Buckets</option><option value="gallons">Single Gallons Only</option></select></div><div class="field"><label>Status</label><select id="status"><option>Draft</option><option>Site Visit Complete</option><option>Estimate Prepared</option><option>Quoted</option></select></div><div class="field span3"><label>Project Notes</label><textarea id="notes"></textarea></div></div></div><section class="scope-group scope-interior" id="interiorGroup"><button class="scope-head" id="toggleInteriorGroup" type="button"><span>Interior<small>Interior rooms and painted surfaces</small></span><span class="scope-chevron">⌄</span></button><div class="scope-body" id="interiorGroupBody"><div class="scope-actions"><button class="btn light" id="addInteriorArea">+ Add Interior Room</button></div><div class="areas" id="interiorAreas"></div></div></section><section class="scope-group scope-exterior hide" id="exteriorGroup"><button class="scope-head" id="toggleExteriorGroup" type="button"><span>Exterior Paint<small>Exterior elevations and painted surfaces</small></span><span class="scope-chevron">⌄</span></button><div class="scope-body" id="exteriorGroupBody"><div class="whole-house-toolbar hide" id="wholeHouseToolbar"><div><b>Whole House Workflow</b><span>Enter each exterior wall in the Whole House card. Add a bump-out only when needed.</span></div><label class="whole-house-bump"><input class="binary-checkbox" id="wholeHouseBumpOut" type="checkbox"><span>Add Bump-Out</span></label></div><div class="exterior-touch-up-shell" id="exteriorTouchUpPanel"><div class="touch-up-control exterior-touch-up-control"><input class="binary-checkbox" id="exteriorTouchUpOnly" type="checkbox"/><div><label for="exteriorTouchUpOnly">Exterior Paint Touch-Up Only</label><small>Hides the normal Exterior Paint workflow without changing it. The selected package is listed directly under Exterior Paint and does not add normal exterior measurements or calculated gallons.</small></div></div><div class="touch-up-fields exterior-touch-up-fields hide" id="exteriorTouchUpFields"></div></div><div class="areas" id="exteriorAreas"></div><div class="scope-actions" id="exteriorNormalActions"><button class="btn light" id="addExteriorArea">+ Add Exterior Paint Elevation</button></div><div id="exteriorPaintSpecs"></div></div></section><section class="scope-group scope-stain hide" id="stainSection"><button class="scope-head" id="toggleStainGroup" type="button"><span>Exterior Stain<small>Deck, fence, and siding stain</small></span><span class="scope-chevron">⌄</span></button><div class="scope-body" id="stainGroupBody"><div class="card stain-card"><p class="photo-note">Select the stain surfaces included in this estimate. Deck boards and individual steps share one finish; spindles and the top rail can match or use separate finishes.</p><div class="stain-grid">
+</section><section class="hide" id="legal"><div class="card legal-page"><div class="row legal-title-row"><div><h2 class="title">Legal &amp; Privacy</h2><p class="legal-version">Paint Project Manager V3.8 · Rev AA</p></div><button class="btn light" id="closeLegal" type="button">Back</button></div><div class="legal-grid"><section><h3>Estimate Use</h3><p>Paint Project Manager is an estimating and workflow aid. Calculations, coverage, quantities, product selections, pricing, availability, measurements, job conditions, and order details must be reviewed before use. The app does not replace field verification, product instructions, store procedures, or professional judgment.</p></section><section><h3>Local Data &amp; Privacy</h3><p>Project records are stored on this device. Protect access to the device and exported backup files. Export data before changing devices or clearing browser storage. Do not enter information that is unnecessary for the estimate or order workflow.</p></section><section><h3>No Purchase Processing</h3><p>The app supports estimating, shopping-list, mixing, staging, and reorder workflows. It does not complete payment, purchasing, delivery, warranty, or customer-contract functions.</p></section><section><h3>Trademark Acknowledgments</h3><p>© 2026 Lowe’s. All rights reserved. Lowe’s and the Gable Mansard Design are registered trademarks of LF, LLC. HGTV HOME, Valspar, Sherwin-Williams, and other product or brand names shown in the app remain the property of their respective owners.</p></section></div></div></section><section class="scope-launcher hide" id="scopeLauncher" role="dialog" aria-modal="true" aria-labelledby="scopeLauncherTitle"><div class="scope-launcher-sheet"><div class="scope-launcher-head"><div><span>NEW PROJECT</span><h2 id="scopeLauncherTitle">Choose Work Included</h2><p>Select the workflow that should start this project. Nothing is created or saved until you choose.</p></div><button type="button" class="btn ghost" id="cancelScopeLauncher">Cancel</button></div><div class="scope-launcher-grid"><button type="button" class="scope-launch-card scope-launch-interior" data-launch-scope="scopeInterior"><b>Interior</b><span>Rooms, walls, ceilings, trim, doors, windows, primer, and paint.</span></button><button type="button" class="scope-launch-card scope-launch-exterior" data-launch-scope="scopeExterior"><b>Exterior Paint</b><span>Exterior paint elevations and related finish options.</span></button><button type="button" class="scope-launch-card scope-launch-stain" data-launch-scope="scopeStain"><b>Exterior Stain</b><span>Deck, fence, and stained-siding workflows.</span></button></div><p class="scope-launcher-foot">No autosave · No draft · No recovery copy · No project record until a scope is selected</p></div></section><section class="exterior-workflow-launcher hide" id="exteriorWorkflowLauncher" role="dialog" aria-modal="true" aria-labelledby="exteriorWorkflowTitle"><div class="exterior-workflow-sheet"><div class="exterior-workflow-head"><div><span>EXTERIOR PAINT</span><h2 id="exteriorWorkflowTitle">Choose Workflow</h2><p>Select the entry method that matches the house.</p></div><button type="button" class="btn ghost" id="cancelExteriorWorkflow">Back</button></div><div class="exterior-workflow-grid"><button type="button" class="exterior-workflow-card recommended" data-exterior-workflow="wholeHouse"><div class="recommended-chip">Recommended</div><b>Whole House</b><span>Enter the house wall by wall as one exterior project. Best when product and color are consistent.</span></button><button type="button" class="exterior-workflow-card" data-exterior-workflow="elevations"><b>Elevation by Elevation</b><span>Keep the current workflow for complex structures, multiple products, or multiple colors.</span></button></div></div></section><section class="hide" id="edit"><div class="card"><div class="row"><h2 class="title" id="et">New Project</h2><b aria-live="polite" class="save-status" data-state="unsaved" id="state">Unsaved changes</b></div><div class="fields"><div class="field"><label>Customer / Project</label><input id="customer"/></div><div class="field"><label>Phone</label><input id="phone" type="tel"/></div><div class="field"><label>Visit Date</label><input id="date" type="date"/></div><div class="field span2"><label>Address</label><input id="address"/></div><div class="field span2"><label>Work Included</label><div class="scope-checks"><label class="scope-tile scope-tile-interior" data-scope-tile="scopeInterior"><input id="scopeInterior" type="checkbox"/> <span>Interior</span></label><label class="scope-tile scope-tile-exterior" data-scope-tile="scopeExterior"><input id="scopeExterior" type="checkbox"/> <span>Exterior Paint</span></label><label class="scope-tile scope-tile-stain" data-scope-tile="scopeStain"><input id="scopeStain" type="checkbox"/> <span>Exterior Stain</span></label></div></div><p class="scope-start-note" id="v36ScopeStartNote">Choose a Work Included scope to start the project. Customer information alone will not create a draft or start autosave.</p><div class="compact-row address-row span3"><div class="field city-field"><label>City</label><input autocomplete="address-level2" id="city"/></div><div class="field state-field"><label>State</label><input autocomplete="address-level1" id="st" maxlength="2" value="OR"/></div><div class="field zip-field"><label>ZIP</label><input autocomplete="postal-code" id="zip" inputmode="numeric"/></div></div><div class="field"><label>Purchase Strategy</label><select id="quartMode"><option selected="" value="bucket">Gallons + 5 Gallon Buckets</option><option value="gallons">Single Gallons Only</option></select></div><div class="field"><label>Status</label><select id="status"><option>Draft</option><option>Site Visit Complete</option><option>Estimate Prepared</option><option>Quoted</option></select></div><div class="field span3"><label>Project Notes</label><textarea id="notes"></textarea></div></div></div><section class="scope-group scope-interior" id="interiorGroup"><button class="scope-head" id="toggleInteriorGroup" type="button"><span>Interior<small>Interior rooms and painted surfaces</small></span><span class="scope-chevron">⌄</span></button><div class="scope-body" id="interiorGroupBody"><div class="scope-actions"><button class="btn light" id="addInteriorArea">+ Add Interior Room</button></div><div class="areas" id="interiorAreas"></div></div></section><section class="scope-group scope-exterior hide" id="exteriorGroup"><button class="scope-head" id="toggleExteriorGroup" type="button"><span>Exterior Paint<small>Exterior elevations and painted surfaces</small></span><span class="scope-chevron">⌄</span></button><div class="scope-body" id="exteriorGroupBody"><div class="whole-house-toolbar hide" id="wholeHouseToolbar"><div><b>Whole House Workflow</b><span>Enter each exterior wall in the Whole House card. Add a bump-out only when needed.</span></div><label class="whole-house-bump"><input class="binary-checkbox" id="wholeHouseBumpOut" type="checkbox"><span>Add Bump-Out</span></label></div><div class="exterior-touch-up-shell" id="exteriorTouchUpPanel"><div class="touch-up-control exterior-touch-up-control"><input class="binary-checkbox" id="exteriorTouchUpOnly" type="checkbox"/><div><label for="exteriorTouchUpOnly">Exterior Paint Touch-Up Only</label><small>Hides the normal Exterior Paint workflow without changing it. The selected package is listed directly under Exterior Paint and does not add normal exterior measurements or calculated gallons.</small></div></div><div class="touch-up-fields exterior-touch-up-fields hide" id="exteriorTouchUpFields"></div></div><div class="areas" id="exteriorAreas"></div><div class="scope-actions" id="exteriorNormalActions"><button class="btn light" id="addExteriorArea">+ Add Exterior Paint Elevation</button></div><div id="exteriorPaintSpecs"></div></div></section><section class="scope-group scope-stain hide" id="stainSection"><button class="scope-head" id="toggleStainGroup" type="button"><span>Exterior Stain<small>Deck, fence, and siding stain</small></span><span class="scope-chevron">⌄</span></button><div class="scope-body" id="stainGroupBody"><div class="card stain-card"><p class="photo-note">Select the stain surfaces included in this estimate. Deck boards and individual steps share one finish; spindles and the top rail can match or use separate finishes.</p><div class="stain-grid">
 <div class="stain-item"><h4>Deck</h4><label><input id="stainDeck" type="checkbox"/> Include deck</label><div class="hide" id="deckDetails"><div class="deck-section-builder"><div class="deck-section-heading"><strong>Deck Sections</strong><small>Each section keeps independent Length × Width dimensions, with a separate Top Rail checkbox beside each dimension.</small></div><div class="deck-section-list" id="deckSectionList"></div><div class="deck-section-add"><select aria-label="Deck section type" id="deckSectionType"><option value="Deck Section">Deck Section</option><option value="Wrap-Around Deck">Wrap-Around Deck</option><option value="Side Porch">Side Porch</option></select><button class="btn light" id="addDeckSection" type="button">+ Add Section</button></div></div><div class="stain-measurements deck-detail-measurements"><div class="field"><label>Spindle Count</label><input id="deckSpindleCount" inputmode="numeric" min="0" placeholder="0" step="1" type="number" value=""/><small>Uses 1.5 sq ft per spindle</small></div><div class="field"><label>Individual Stair Treads / Steps</label><input id="deckStairTreadCount" inputmode="numeric" min="0" placeholder="0" step="1" type="number" value=""/><small>Enter the total number of individual steps—not stair sets. Standard dimensions are applied automatically.</small></div></div><div class="stain-selection-grid deck-board-selection"><section class="stain-product-section" data-stain-key="deckBoards"><h5>Deck Boards &amp; Individual Steps — Product &amp; Color</h5><div class="stain-product-fields"><div class="field"><label>Product</label><select data-stain-field="product"><option value="Cabot">Cabot</option><option value="Valspar">Valspar</option></select></div><div class="field"><label>Stain Type</label><select data-stain-field="stainType"></select></div><div class="field"><label>Color</label><input data-stain-field="color" placeholder="Color name or number"/></div><div class="field"><label>Surface Condition</label><select data-stain-field="surfaceMode"><option value="smooth">Smooth / prepared</option><option value="rough">Rough / weathered</option></select></div><div class="field">
 <label>Coverage</label>
 <select data-stain-field="coverageMode"><option value="default">400 sq ft/gal</option><option value="custom">Custom Coverage</option></select>
@@ -11399,5 +11399,151 @@ html body input#completedLiveFilter:-webkit-autofill,
 html body input#completedLiveFilter:-webkit-autofill:hover,
 html body input#completedLiveFilter:-webkit-autofill:focus,
 html body input#completedLiveFilter:-webkit-autofill:active{-webkit-text-fill-color:#fff!important;caret-color:#fff!important;-webkit-box-shadow:0 0 0 1000px #101114 inset!important;box-shadow:0 0 0 1000px #101114 inset!important}
+</style>
+
+<style id="v38-rev-aa-project-defaults-final-contrast">
+/* V3.8 Rev AA: the Project Calculation Defaults card is white, so labels and helper copy use dark ink. */
+html body #defaultsGroupBody .defaults-card .field > label,
+html body #defaultsGroupBody .defaults-card .field > small,
+html body #defaultsGroupBody .defaults-card .field > p,
+html body #defaultsGroupBody .defaults-card .photo-note,
+html body #defaultsGroupBody .defaults-card .muted,
+html body #defaultsGroupBody .defaults-card .helper,
+html body #defaultsGroupBody .defaults-card .hint,
+html body #defaultsGroupBody .defaults-card .opening-heading,
+html body #defaultsGroupBody .defaults-card .opening-heading *{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+/* Keep all labels readable through hover, focus-within, active, and disabled field states. */
+html body #defaultsGroupBody .defaults-card .field:hover > label,
+html body #defaultsGroupBody .defaults-card .field:focus-within > label,
+html body #defaultsGroupBody .defaults-card .field:active > label,
+html body #defaultsGroupBody .defaults-card .field:hover > small,
+html body #defaultsGroupBody .defaults-card .field:focus-within > small,
+html body #defaultsGroupBody .defaults-card .field:active > small,
+html body #defaultsGroupBody .defaults-card .field.disabled > label,
+html body #defaultsGroupBody .defaults-card .field.disabled > small{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+</style>
+
+<style id="v38-rev-aa-project-defaults-complete-contrast">
+/* V3.8 Rev AA: complete final authority for every text element on the light Project Defaults surfaces. */
+html body #defaultsGroupBody .defaults-card,
+html body #defaultsGroupBody .defaults-card .fields,
+html body #defaultsGroupBody .defaults-card .field,
+html body #defaultsGroupBody .defaults-card label,
+html body #defaultsGroupBody .defaults-card small,
+html body #defaultsGroupBody .defaults-card p,
+html body #defaultsGroupBody .defaults-card span,
+html body #defaultsGroupBody .defaults-card strong,
+html body #defaultsGroupBody .defaults-card b,
+html body #defaultsGroupBody .defaults-card legend,
+html body #defaultsGroupBody .defaults-card .section-label,
+html body #defaultsGroupBody .defaults-card .section-label *,
+html body #defaultsGroupBody .defaults-card .opening-heading,
+html body #defaultsGroupBody .defaults-card .opening-heading *,
+html body #defaultsGroupBody .defaults-card .photo-note,
+html body #defaultsGroupBody .defaults-card .muted,
+html body #defaultsGroupBody .defaults-card .helper,
+html body #defaultsGroupBody .defaults-card .hint,
+html body #defaultsGroupBody .defaults-card .note{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+/* Dark form controls keep light values, carets, and option text. */
+html body #defaultsGroupBody .defaults-card input,
+html body #defaultsGroupBody .defaults-card select,
+html body #defaultsGroupBody .defaults-card textarea,
+html body #defaultsGroupBody .defaults-card option,
+html body #defaultsGroupBody .defaults-card input:hover,
+html body #defaultsGroupBody .defaults-card input:focus,
+html body #defaultsGroupBody .defaults-card input:active,
+html body #defaultsGroupBody .defaults-card select:hover,
+html body #defaultsGroupBody .defaults-card select:focus,
+html body #defaultsGroupBody .defaults-card select:active{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  caret-color:#fff!important;
+  opacity:1!important;
+}
+html body #defaultsGroupBody .defaults-card input::placeholder,
+html body #defaultsGroupBody .defaults-card textarea::placeholder{
+  color:#f4dfc3!important;
+  -webkit-text-fill-color:#f4dfc3!important;
+  opacity:1!important;
+}
+/* Recovery/offline card is also light: all copy is dark, while its dark action stays white. */
+html body #storageProtection,
+html body #storageProtection > b,
+html body #storageProtection > span,
+html body #storageProtectionStatus{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+html body #storageProtection #requestPersistentStorage,
+html body #storageProtection #requestPersistentStorage *,
+html body #storageProtection #requestPersistentStorage:hover,
+html body #storageProtection #requestPersistentStorage:focus,
+html body #storageProtection #requestPersistentStorage:focus-visible,
+html body #storageProtection #requestPersistentStorage:active,
+html body #storageProtection #requestPersistentStorage:disabled{
+  color:#fff!important;
+  -webkit-text-fill-color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+</style>
+
+<style id="v38-rev-aa-legal-statements-complete-contrast">
+/* V3.8 Rev AA: complete final authority for all Legal & Privacy text on light surfaces. */
+html body #legal .legal-page,
+html body #legal .legal-page .legal-title-row,
+html body #legal .legal-page .legal-title-row h2,
+html body #legal .legal-page .legal-version,
+html body #legal .legal-page .legal-grid,
+html body #legal .legal-page .legal-grid section,
+html body #legal .legal-page .legal-grid section h3,
+html body #legal .legal-page .legal-grid section p,
+html body #legal .legal-page .legal-grid section span,
+html body #legal .legal-page .legal-grid section small,
+html body #legal .legal-page .legal-grid section b,
+html body #legal .legal-page .legal-grid section strong,
+html body #legal .legal-page .legal-grid section li,
+html body #legal .legal-page .legal-grid section a,
+html body #legal .legal-page .legal-manage-card,
+html body #legal .legal-page .legal-manage-card div,
+html body #legal .legal-page .legal-manage-card b,
+html body #legal .legal-page .legal-manage-card small,
+html body #legal .legal-page .legal-manage-card span,
+html body #legal .legal-page .legal-manage-card p{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+/* Back remains a light button with dark text in every state. */
+html body #legal #closeLegal,
+html body #legal #closeLegal *,
+html body #legal #closeLegal:hover,
+html body #legal #closeLegal:focus,
+html body #legal #closeLegal:focus-visible,
+html body #legal #closeLegal:active,
+html body #legal #closeLegal:disabled{
+  color:#111827!important;
+  -webkit-text-fill-color:#111827!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
 </style>
 </body></html>
