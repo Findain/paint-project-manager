@@ -11020,4 +11020,125 @@ html body #undoLastChange *{
  document.addEventListener('click',e=>{if(e.target.closest?.('#new2,#scopeLauncher,[data-launch-scope]'))setTimeout(fix,0)},true);
 })();
 </script>
+
+<style id="v36-rev-aa-settings-contrast-and-audit">
+/* Screenshot fixes: light Settings surfaces require dark text. */
+#back .settings-defaults .scope-head,
+#back .settings-defaults .scope-head *,
+#back .legal-row,
+#back .legal-row :is(h1,h2,h3,h4,p,span,small,strong),
+#back .legal-summary,
+#back .legal-summary *{
+ color:#111827!important;-webkit-text-fill-color:#111827!important;opacity:1!important;text-shadow:none!important
+}
+#back .settings-defaults .scope-head{background:#eaf5fa!important}
+#back .legal-row{background:#fffaf5!important}
+#back :is(#viewLegal,.legal-button),
+#back :is(#viewLegal,.legal-button) *{
+ background:#ffedc9!important;color:#3a2417!important;-webkit-text-fill-color:#3a2417!important;opacity:1!important
+}
+/* Diagnostic outlines are visible only when the contrast audit is enabled. */
+.ppm-contrast-fail{outline:4px solid #e11d48!important;outline-offset:2px!important}
+#ppmContrastAuditPanel{position:fixed;right:12px;bottom:12px;z-index:2147483647;width:min(420px,calc(100vw - 24px));max-height:60dvh;overflow:auto;padding:14px;border:2px solid #e11d48;border-radius:14px;background:#111827;color:#fff;box-shadow:0 18px 50px #0009}
+#ppmContrastAuditPanel.hide{display:none!important}#ppmContrastAuditPanel *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#ppmContrastAuditPanel button{background:#fff;color:#111827!important;-webkit-text-fill-color:#111827!important;border:0;border-radius:8px;padding:7px 10px;font-weight:900}
+.ppm-audit-row{padding:7px 0;border-top:1px solid #ffffff33;font-size:12px}
+</style>
+<script id="v36-rev-aa-contrast-audit-system">
+(()=>{
+ 'use strict';
+ const ratio=(a,b)=>(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+ const lum=color=>{
+  const m=String(color).match(/[\d.]+/g);if(!m||m.length<3)return null;
+  const c=m.slice(0,3).map(v=>{v=Number(v)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});
+  return .2126*c[0]+.7152*c[1]+.0722*c[2];
+ };
+ function background(el){for(let node=el;node;node=node.parentElement){const c=getComputedStyle(node).backgroundColor,m=c.match(/[\d.]+/g);if(m&&Number(m[3]??1)>.05)return c}return 'rgb(255,255,255)'}
+ function label(el){return (el.id?'#'+el.id:el.className&&typeof el.className==='string'?'.'+el.className.trim().split(/\s+/).slice(0,2).join('.'):el.tagName).slice(0,90)}
+ function scan(showPanel=true){
+  document.querySelectorAll('.ppm-contrast-fail').forEach(el=>el.classList.remove('ppm-contrast-fail'));
+  const failures=[];
+  document.querySelectorAll('h1,h2,h3,h4,h5,h6,p,label,small,span,button,a,strong,input,textarea,select').forEach(el=>{
+   if(!el.offsetParent||el.closest('#ppmContrastAuditPanel'))return;
+   const css=getComputedStyle(el),fg=lum(css.color),bg=lum(background(el));if(fg==null||bg==null)return;
+   const required=parseFloat(css.fontSize)>=18||parseInt(css.fontWeight)>=700&&parseFloat(css.fontSize)>=14?3:4.5;
+   const value=ratio(fg,bg);if(value<required){el.classList.add('ppm-contrast-fail');failures.push({el,value,label:label(el),text:(el.innerText||el.value||el.getAttribute('aria-label')||'').trim().slice(0,55)})}
+  });
+  let panel=document.getElementById('ppmContrastAuditPanel');
+  if(!panel){document.body.insertAdjacentHTML('beforeend','<aside id="ppmContrastAuditPanel" class="hide"><div style="display:flex;justify-content:space-between;gap:8px"><b>Contrast Audit</b><button type="button" id="ppmCloseAudit">Close</button></div><p id="ppmAuditSummary"></p><div id="ppmAuditRows"></div></aside>');panel=document.getElementById('ppmContrastAuditPanel');document.getElementById('ppmCloseAudit').onclick=()=>{panel.classList.add('hide');document.querySelectorAll('.ppm-contrast-fail').forEach(el=>el.classList.remove('ppm-contrast-fail'))}}
+  document.getElementById('ppmAuditSummary').textContent=failures.length+' visible contrast issue'+(failures.length===1?'':'s')+' on this screen.';
+  document.getElementById('ppmAuditRows').innerHTML=failures.slice(0,40).map(f=>'<div class="ppm-audit-row"><b>'+f.label+'</b> · '+f.value.toFixed(2)+':1<br>'+f.text.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))+'</div>').join('');
+  if(showPanel)panel.classList.remove('hide');
+  return failures;
+ }
+ window.PPMContrastAudit={scan};
+ /* Ctrl+Alt+C runs the audit on whichever screen or popup is currently visible. */
+ document.addEventListener('keydown',event=>{if(event.ctrlKey&&event.altKey&&event.key.toLowerCase()==='c'){event.preventDefault();scan(true)}});
+})();
+</script>
+
+<style id="v36-rev-aa-settings-palette-authority">
+/* Settings palette authority: surface color owns text color. */
+#back .settings-top,
+#back .settings-panel,
+#back .maintenance-reminder{
+  background:#211713!important;
+  color:#fff!important;
+  border-color:#70482f!important;
+}
+#back .settings-top :is(h1,h2,h3,h4,strong,b),
+#back .settings-panel :is(h1,h2,h3,h4,strong,b),
+#back .maintenance-reminder :is(h1,h2,h3,h4,strong,b){
+  color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;text-shadow:none!important
+}
+#back .settings-top :is(p,span,small,label),
+#back .settings-panel :is(p,span,small,label),
+#back .maintenance-reminder :is(p,span,small,label){
+  color:#f7e7d7!important;-webkit-text-fill-color:#f7e7d7!important;opacity:1!important;text-shadow:none!important
+}
+#back .settings-kicker,
+#back .settings-panel>h3{color:#ffc078!important;-webkit-text-fill-color:#ffc078!important}
+/* Dark controls always use light labels. */
+#back :is(.btn.primary,.btn.danger,.help-item,#checkUpdates,#updateNow,#backupNow),
+#back :is(.btn.primary,.btn.danger,.help-item,#checkUpdates,#updateNow,#backupNow) *{
+  color:#fff!important;-webkit-text-fill-color:#fff!important;opacity:1!important;text-shadow:none!important
+}
+/* Light controls and cards always use dark labels. */
+#back :is(.btn.light,.settings-defaults .scope-head,.legal-manage-card,.help-placeholder,.update-result.light-surface),
+#back :is(.btn.light,.settings-defaults .scope-head,.legal-manage-card,.help-placeholder,.update-result.light-surface) *{
+  color:#111827!important;-webkit-text-fill-color:#111827!important;opacity:1!important;text-shadow:none!important
+}
+#back .settings-defaults .scope-head{background:#eaf5fa!important;border-color:#9fc5d6!important}
+#back .legal-manage-card{background:#fffaf5!important;border-color:#ff7416!important}
+#back .legal-manage-card b,
+#back .legal-manage-card small{color:#111827!important;-webkit-text-fill-color:#111827!important}
+#back #openLegalManage,
+#back #openLegalManage *{
+  background:#ffedc9!important;color:#3a2417!important;-webkit-text-fill-color:#3a2417!important;opacity:1!important
+}
+#back .settings-build-pill{color:#ffe0bd!important;-webkit-text-fill-color:#ffe0bd!important}
+/* Inputs stay white-on-black. */
+#back :is(input,textarea,select){background:#101114!important;color:#fff!important;-webkit-text-fill-color:#fff!important;caret-color:#fff!important}
+#back :is(input,textarea)::placeholder{color:#ffd8b5!important;-webkit-text-fill-color:#ffd8b5!important;opacity:1!important}
+</style>
+<script id="v36-rev-aa-settings-palette-runtime">
+(()=>{
+ 'use strict';
+ let scheduled=false;
+ const put=(el,p,v)=>{if(el&&el.style.getPropertyValue(p)!==v)el.style.setProperty(p,v,'important')};
+ function darkText(root){root?.querySelectorAll('h1,h2,h3,h4,p,span,small,label,strong,b,button').forEach(el=>{put(el,'color','#111827');put(el,'-webkit-text-fill-color','#111827');put(el,'opacity','1');put(el,'text-shadow','none')})}
+ function fix(){
+  scheduled=false;
+  const back=document.getElementById('back');if(!back)return;
+  darkText(back.querySelector('.legal-manage-card'));
+  darkText(back.querySelector('.settings-defaults .scope-head'));
+  const legal=back.querySelector('#openLegalManage');if(legal){put(legal,'color','#3a2417');put(legal,'-webkit-text-fill-color','#3a2417')}
+ }
+ function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(fix)}
+ const observer=new MutationObserver(schedule);
+ function start(){observer.observe(document.body,{subtree:true,childList:true});schedule()}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+ document.addEventListener('click',event=>{if(event.target.closest?.('[data-home-route="settings"],#settings,#back'))setTimeout(schedule,0)},true);
+})();
+</script>
 </body></html>
