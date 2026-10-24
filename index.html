@@ -9640,26 +9640,6 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
  });
 })();
 </script>
-<script id="ppm-v36-service-worker-registration">
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js', {scope:'./'}).catch(console.error));
-}
-</script>
-<script id="v36-live-update-final-v7">
-(()=>{
- let reg=null,reloading=false;
- const el=id=>document.getElementById(id);
- const setStatus=text=>{if(el('updateStatus'))el('updateStatus').textContent=text};
- const showReady=()=>{el('updateResult')?.classList.remove('hide');setStatus('Update ready');if(el('updateDetail'))el('updateDetail').textContent='The new release is downloaded and ready to activate.';if(el('updateNow')){el('updateNow').disabled=false;el('updateNow').textContent='Update Now'}};
- const bindRegistration=r=>{reg=r;if(r.waiting)showReady();r.addEventListener('updatefound',()=>{const w=r.installing;if(!w)return;setStatus('Downloading update…');w.addEventListener('statechange',()=>{if(w.state==='installed'){navigator.serviceWorker.controller?showReady():setStatus('App ready')}})})};
- if('serviceWorker' in navigator){
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloading){reloading=true;location.reload()}});
-  addEventListener('load',async()=>{try{bindRegistration(await navigator.serviceWorker.register('./service-worker.js',{scope:'./',updateViaCache:'none'}));await reg.update()}catch(e){setStatus('Update check unavailable')}});
- }
- el('checkUpdates')?.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();setStatus('Checking live release…');el('updateResult')?.classList.add('hide');try{reg=reg||await navigator.serviceWorker.getRegistration();if(!reg)throw new Error('No registration');await reg.update();await new Promise(r=>setTimeout(r,1000));reg.waiting?showReady():setStatus('Current release loaded')}catch(x){setStatus(navigator.onLine?'Unable to check for updates':'Offline · try again when connected')}},true);
- el('updateNow')?.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();if(!reg)reg=await navigator.serviceWorker.getRegistration();if(reg?.waiting){el('updateNow').disabled=true;el('updateNow').textContent='Applying…';reg.waiting.postMessage({type:'SKIP_WAITING'})}else{setStatus('Checking again…');await reg?.update();setTimeout(()=>reg?.waiting?showReady():setStatus('Current release loaded'),1000)}},true);
-})();
-</script>
 <style id="v36-rev-d-focused-scope-style">
 /* High-contrast text across controls that previously inherited the pale blue/grey treatment. */
 body:not([data-app-view="home"]) .ghost,
@@ -11553,4 +11533,80 @@ html body #legal #closeLegal:disabled{
   text-shadow:none!important;
 }
 </style>
-<script id="ppm-recovery-splash-release">window.addEventListener('load',function(){window.setTimeout(function(){var splash=document.getElementById('splash');if(splash){splash.classList.add('fade');window.setTimeout(function(){if(splash.parentNode)splash.parentNode.removeChild(splash);},600);}},12000);},{once:true});</script></body></html>
+<script id="ppm-recovery-splash-release">window.addEventListener('load',function(){window.setTimeout(function(){var splash=document.getElementById('splash');if(splash){splash.classList.add('fade');window.setTimeout(function(){if(splash.parentNode)splash.parentNode.removeChild(splash);},600);}},12000);},{once:true});</script>
+<script id="ppm-v38-update-controller">
+(()=>{
+  let registration=null;
+  let activating=false;
+  let reloadIssued=false;
+  const byId=id=>document.getElementById(id);
+  const setStatus=text=>{const node=byId('updateStatus');if(node)node.textContent=text;};
+  const setButton=(text,disabled=false)=>{const button=byId('updateNow');if(button){button.textContent=text;button.disabled=disabled;}};
+  const showReady=()=>{byId('updateResult')?.classList.remove('hide');setStatus('Update ready');setButton('Update Now',false);const detail=byId('updateDetail');if(detail)detail.textContent='The update is downloaded and ready to activate.';};
+  const watchInstalling=worker=>{
+    if(!worker)return;
+    setStatus('Downloading update…');
+    worker.addEventListener('statechange',()=>{
+      if(worker.state==='installed') showReady();
+      if(worker.state==='redundant'){setStatus('Update download failed');setButton('Try Again',false);}
+    });
+  };
+  const bind=reg=>{
+    registration=reg;
+    if(reg.waiting)showReady();
+    if(reg.installing)watchInstalling(reg.installing);
+    reg.addEventListener('updatefound',()=>watchInstalling(reg.installing));
+  };
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(!activating||reloadIssued)return;
+      reloadIssued=true;
+      setStatus('Update installed · reopening…');
+      setTimeout(()=>location.reload(),350);
+    });
+    window.addEventListener('load',async()=>{
+      try{
+        const reg=await navigator.serviceWorker.register('./service-worker.js?v=recovery-16',{scope:'./',updateViaCache:'none'});
+        bind(reg);
+      }catch(error){setStatus('Update system unavailable');setButton('Try Again',false);}
+    },{once:true});
+  }
+  byId('checkUpdates')?.addEventListener('click',async event=>{
+    event.preventDefault();event.stopImmediatePropagation();
+    setStatus('Checking for updates…');
+    byId('updateResult')?.classList.add('hide');
+    try{
+      registration=registration||await navigator.serviceWorker.getRegistration('./');
+      if(!registration)throw new Error('No service worker registration');
+      await registration.update();
+      setTimeout(()=>{
+        if(registration.waiting)showReady();
+        else if(registration.installing){setStatus('Downloading update…');setButton('Installing…',true);}
+        else setStatus('Current release loaded');
+      },800);
+    }catch(error){setStatus(navigator.onLine?'Unable to check for updates':'Offline · try again when connected');setButton('Try Again',false);}
+  },true);
+  byId('updateNow')?.addEventListener('click',async event=>{
+    event.preventDefault();event.stopImmediatePropagation();
+    try{
+      registration=registration||await navigator.serviceWorker.getRegistration('./');
+      if(!registration)throw new Error('No service worker registration');
+      if(!registration.waiting){
+        setStatus('Checking for update…');setButton('Checking…',true);
+        await registration.update();
+        await new Promise(resolve=>setTimeout(resolve,1000));
+      }
+      if(registration.waiting){
+        activating=true;setStatus('Installing update…');setButton('Installing…',true);
+        registration.waiting.postMessage({type:'SKIP_WAITING'});
+        setTimeout(()=>{
+          if(!reloadIssued){setStatus('Update installed · close and reopen the app');setButton('Reopen App',false);}
+        },8000);
+      }else{
+        setStatus('Current release loaded');setButton('Update Now',false);
+      }
+    }catch(error){setStatus('Unable to install update');setButton('Try Again',false);}
+  },true);
+})();
+</script>
+</body></html>
