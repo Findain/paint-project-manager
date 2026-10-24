@@ -1,1 +1,9 @@
-const CACHE='ppm-v38-aa-14-new-identity';const FILES=['./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));self.addEventListener('message',e=>{if(e.data&&e.data.type==='SKIP_WAITING')self.skipWaiting()});self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==CACHE).map(x=>caches.delete(x)))).then(()=>self.clients.claim())));self.addEventListener('fetch',e=>{if(e.request.method==='GET')e.respondWith(fetch(e.request,{cache:'no-store'}).catch(()=>caches.match(e.request).then(r=>r||caches.match('./index.html'))))});
+const CACHE='ppm-v38-recovery-15';
+self.addEventListener('install',event=>{event.waitUntil(Promise.resolve());});
+self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('ppm-')&&key!==CACHE).map(key=>caches.delete(key)))));});
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET') return;
+  event.respondWith(fetch(event.request,{cache:'no-store'}).then(response=>{
+    if(response&&response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy)).catch(()=>{});}return response;
+  }).catch(()=>caches.match(event.request).then(hit=>hit||caches.match('./index.html'))));
+});
