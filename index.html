@@ -11553,4 +11553,58 @@ html body #legal #closeLegal:disabled{
   text-shadow:none!important;
 }
 </style>
+
+<style id="ppm-current-build-contrast-fix">
+/* Final high-specificity contrast fixes for the current working build. */
+#exteriorGroup > .scope-head,
+#exteriorGroup > .scope-head * {
+  color:#102033 !important;
+  -webkit-text-fill-color:#102033 !important;
+  opacity:1 !important;
+  text-shadow:none !important;
+}
+#walkLinkerModal .walk-link-result-row,
+#walkLinkerModal .walk-link-result-row *,
+#walkLinkerModal .walk-link-result-copy,
+#walkLinkerModal .walk-link-result-copy b,
+#walkLinkerModal .walk-link-result-copy span {
+  color:#102033 !important;
+  -webkit-text-fill-color:#102033 !important;
+  opacity:1 !important;
+  text-shadow:none !important;
+}
+#walkLinkerModal .walk-select-button,
+#walkLinkerModal .walk-select-button * {
+  color:#ffffff !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+</style>
+<script id="ppm-current-build-contrast-runtime-lock">
+(()=>{
+  const apply=()=>{
+    const exterior=document.querySelector('#exteriorGroup > .scope-head');
+    if(exterior) [exterior,...exterior.querySelectorAll('*')].forEach(el=>{
+      el.style.setProperty('color','#102033','important');
+      el.style.setProperty('-webkit-text-fill-color','#102033','important');
+      el.style.setProperty('opacity','1','important');
+      el.style.setProperty('text-shadow','none','important');
+    });
+    document.querySelectorAll('#walkLinkerModal .walk-link-result-row').forEach(row=>{
+      [row,...row.querySelectorAll('*:not(.walk-select-button)')].forEach(el=>{
+        if(el.closest('.walk-select-button')) return;
+        el.style.setProperty('color','#102033','important');
+        el.style.setProperty('-webkit-text-fill-color','#102033','important');
+        el.style.setProperty('opacity','1','important');
+        el.style.setProperty('text-shadow','none','important');
+      });
+    });
+    document.querySelectorAll('#walkLinkerModal .walk-select-button').forEach(btn=>{
+      btn.style.setProperty('color','#ffffff','important');
+      btn.style.setProperty('-webkit-text-fill-color','#ffffff','important');
+    });
+  };
+  document.addEventListener('DOMContentLoaded',apply,{once:true});
+  new MutationObserver(apply).observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['class','style']});
+})();
+</script>
 </body></html>
