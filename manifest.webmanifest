@@ -1,9 +1,8 @@
 {
-  "id": "./paint-project-manager",
-  "name": "Paint Project Manager",
+  "name": "Paint Project Manager V3.6",
   "short_name": "Paint Project Manager",
-  "description": "Paint Project Manager V3.8 · Rev AA",
-  "start_url": "./index.html",
+  "description": "Paint Project Manager",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b1724",
