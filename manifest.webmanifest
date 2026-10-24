@@ -1,8 +1,8 @@
 {
-  "id": "./?v=3.8-aa-11",
+  "id": "./?v=3.8-aa-12",
   "name": "Paint Project Manager V3.8 \u00b7 Rev AA",
   "short_name": "PPM V3.8",
-  "start_url": "./index.html?v=3.8-aa-11",
+  "start_url": "./index.html?v=3.8-aa-12",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b1724",
