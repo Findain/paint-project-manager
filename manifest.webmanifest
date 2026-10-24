@@ -1,9 +1,9 @@
 {
-  "id": "./paint-project-manager-v3-8-rev-aa",
-  "name": "Paint Project Manager V3.8 · Rev AA",
-  "short_name": "PPM V3.8",
+  "id": "./paint-project-manager",
+  "name": "Paint Project Manager",
+  "short_name": "Paint Project Manager",
   "description": "Paint Project Manager V3.8 · Rev AA",
-  "start_url": "./index.html?v=3.8-aa-14",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#0b1724",
@@ -12,12 +12,14 @@
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
