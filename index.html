@@ -1314,7 +1314,7 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
 <div class="settings-shell">
 <div class="settings-top"><div><span class="settings-kicker">PAINT PROJECT MANAGER</span><h2>Settings</h2><p>Application controls, backups, maintenance, diagnostics, and help.</p></div><span class="settings-build-pill">V3.8 · Rev AA</span></div>
 <div class="settings-grid">
-<section class="settings-panel"><h3>Application</h3><div class="setting-row"><span>Version</span><strong>V3.8 · Rev AA</strong></div><div class="setting-row"><span>Update Status</span><strong id="updateStatus">Ready to check</strong></div><button class="btn primary" id="checkUpdates" type="button">Check For Updates</button><div class="update-result hide" id="updateResult"><div><span>Current</span><b>V3.8 · Rev AA</b></div><div><span>Latest</span><b>V3.8 · Rev AA</b></div><button class="btn primary" id="updateNow" type="button">Update Now</button><small id="updateDetail">Checks GitHub Pages for the newest deployed release.</small></div></section><section class="settings-panel settings-wide"><h3>Project Defaults</h3><div class="settings-defaults-wrap"><h3>Project Defaults</h3><p class="muted">Set the calculation defaults used by project walks.</p><section class="scope-group defaults-group settings-defaults collapsed" id="defaultsGroup">
+<section class="settings-panel"><h3>Application</h3><div class="setting-row"><span>Version</span><strong>V3.8 · Rev AA</strong></div><div class="setting-row"><span>Update Status</span><strong id="updateStatus">Ready to check</strong></div><button class="btn primary" id="checkUpdates" type="button">Check For Updates</button><div class="update-result hide" id="updateResult"><div><span>Current</span><b>V3.8 · Rev AA</b></div><div><span>Latest</span><b>V3.8 · Rev B</b></div><button class="btn primary" id="updateNow" type="button">Update Now</button><small id="updateDetail">Checks GitHub Pages for the newest deployed release.</small></div></section><section class="settings-panel settings-wide"><h3>Project Defaults</h3><div class="settings-defaults-wrap"><h3>Project Defaults</h3><p class="muted">Set the calculation defaults used by project walks.</p><section class="scope-group defaults-group settings-defaults collapsed" id="defaultsGroup">
 <button aria-controls="defaultsGroupBody" class="scope-head" id="toggleDefaultsGroup" type="button">
 <span>Project Calculation Defaults<small>Inherited by new and existing surfaces unless a local override is selected</small></span>
 <span class="scope-chevron">›</span>
@@ -9640,86 +9640,24 @@ body:not([data-app-view="home"]) :is(#undoLastChange,[data-undo],.undo-last-chan
  });
 })();
 </script>
+<script id="ppm-v36-service-worker-registration">
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js', {scope:'./'}).catch(console.error));
+}
+</script>
 <script id="v36-live-update-final-v7">
 (()=>{
-  let reg=null, applying=false, reloaded=false;
-  const el=id=>document.getElementById(id);
-  const setStatus=text=>{const node=el('updateStatus');if(node)node.textContent=text};
-  const setDetail=text=>{const node=el('updateDetail');if(node)node.textContent=text};
-  const paint=()=>{
-    const waiting=reg&&reg.waiting;
-    el('updateResult')?.classList.remove('hide');
-    if(waiting){
-      setStatus('Update ready');
-      setDetail('A newer published release is installed and waiting to activate.');
-      if(el('updateNow')){el('updateNow').disabled=false;el('updateNow').textContent='Update Now'}
-    }else{
-      setStatus('Current release loaded');
-      setDetail('V3.8 · Rev AA is the newest published release.');
-      if(el('updateNow')){el('updateNow').disabled=true;el('updateNow').textContent='No Update Available'}
-    }
-  };
-  const bind=r=>{
-    reg=r;
-    paint();
-    r.addEventListener('updatefound',()=>{
-      const worker=r.installing;
-      if(!worker)return;
-      setStatus('Downloading update…');
-      worker.addEventListener('statechange',()=>{
-        if(worker.state==='installed')paint();
-      });
-    });
-  };
-  if(!('serviceWorker' in navigator))return;
-  addEventListener('load',async()=>{
-    try{
-      const existing=await navigator.serviceWorker.getRegistration('./');
-      if(existing)bind(existing);
-      else bind(await navigator.serviceWorker.register('./service-worker.js',{scope:'./',updateViaCache:'none'}));
-      await reg.update();
-      setTimeout(paint,800);
-    }catch(error){
-      setStatus('Update check unavailable');
-      setDetail('The app remains available, but the update service could not be reached.');
-    }
-  },{once:true});
-  el('checkUpdates')?.addEventListener('click',async event=>{
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    setStatus('Checking live release…');
-    try{
-      if(!reg){
-        const existing=await navigator.serviceWorker.getRegistration('./');
-        if(existing)bind(existing);
-        else bind(await navigator.serviceWorker.register('./service-worker.js',{scope:'./',updateViaCache:'none'}));
-      }
-      await reg.update();
-      setTimeout(paint,800);
-    }catch(error){
-      setStatus(navigator.onLine?'Unable to check for updates':'Offline · try again when connected');
-    }
-  },true);
-  el('updateNow')?.addEventListener('click',event=>{
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    if(!reg||!reg.waiting){paint();return;}
-    applying=true;
-    reloaded=false;
-    setStatus('Applying update…');
-    setDetail('The app will reload once when the new release takes control.');
-    reg.waiting.postMessage({type:'SKIP_WAITING'});
-  },true);
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{
-    if(!applying||reloaded)return;
-    reloaded=true;
-    applying=false;
-    sessionStorage.setItem('ppmUpdateReloaded','1');
-    setTimeout(()=>location.reload(),300);
-  });
-  if(sessionStorage.getItem('ppmUpdateReloaded')){
-    sessionStorage.removeItem('ppmUpdateReloaded');
-  }
+ let reg=null,reloading=false;
+ const el=id=>document.getElementById(id);
+ const setStatus=text=>{if(el('updateStatus'))el('updateStatus').textContent=text};
+ const showReady=()=>{el('updateResult')?.classList.remove('hide');setStatus('Update ready');if(el('updateDetail'))el('updateDetail').textContent='The new release is downloaded and ready to activate.';if(el('updateNow')){el('updateNow').disabled=false;el('updateNow').textContent='Update Now'}};
+ const bindRegistration=r=>{reg=r;if(r.waiting)showReady();r.addEventListener('updatefound',()=>{const w=r.installing;if(!w)return;setStatus('Downloading update…');w.addEventListener('statechange',()=>{if(w.state==='installed'){navigator.serviceWorker.controller?showReady():setStatus('App ready')}})})};
+ if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!reloading){reloading=true;location.reload()}});
+  addEventListener('load',async()=>{try{bindRegistration(await navigator.serviceWorker.register('./service-worker.js',{scope:'./',updateViaCache:'none'}));await reg.update()}catch(e){setStatus('Update check unavailable')}});
+ }
+ el('checkUpdates')?.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();setStatus('Checking live release…');el('updateResult')?.classList.add('hide');try{reg=reg||await navigator.serviceWorker.getRegistration();if(!reg)throw new Error('No registration');await reg.update();await new Promise(r=>setTimeout(r,1000));reg.waiting?showReady():setStatus('Current release loaded')}catch(x){setStatus(navigator.onLine?'Unable to check for updates':'Offline · try again when connected')}},true);
+ el('updateNow')?.addEventListener('click',async e=>{e.preventDefault();e.stopImmediatePropagation();if(!reg)reg=await navigator.serviceWorker.getRegistration();if(reg?.waiting){el('updateNow').disabled=true;el('updateNow').textContent='Applying…';reg.waiting.postMessage({type:'SKIP_WAITING'})}else{setStatus('Checking again…');await reg?.update();setTimeout(()=>reg?.waiting?showReady():setStatus('Current release loaded'),1000)}},true);
 })();
 </script>
 <style id="v36-rev-d-focused-scope-style">
