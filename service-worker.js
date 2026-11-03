@@ -6,13 +6,12 @@
    - Update-check and refresh requests are never saved (they would fill storage).
    - Only this worker touches Cache Storage. Walks, orders and settings live in
      localStorage and are never read or changed here. */
-const CACHE_NAME = 'ppm-v39-rev-ah';
+const CACHE_NAME = 'ppm-v39-rev-ao';
 const SHELL = 'index.html';
 const OPTIONAL = ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 const NETWORK_WAIT_MS = 3000;
 const CACHEABLE = /\.(?:png|jpe?g|svg|ico|webmanifest|json)$/i;
 const scoped = path => new URL(path, self.registration.scope).href;
-
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
@@ -29,7 +28,6 @@ self.addEventListener('install', event => {
     }));
   })());
 });
-
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
@@ -39,18 +37,15 @@ self.addEventListener('activate', event => {
     await self.clients.claim();
   })());
 });
-
 self.addEventListener('message', event => {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
-
 self.addEventListener('fetch', event => {
   const request = event.request;
   if (request.method !== 'GET') return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
   if (url.searchParams.has('updateCheck') || url.searchParams.has('refresh')) return;
-
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
       const cache = await caches.open(CACHE_NAME);
@@ -72,7 +67,6 @@ self.addEventListener('fetch', event => {
     })());
     return;
   }
-
   if (!CACHEABLE.test(url.pathname)) return;
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
