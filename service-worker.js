@@ -6,7 +6,7 @@
    - Update-check and refresh requests are never saved (they would fill storage).
    - Only this worker touches Cache Storage. Walks, orders and settings live in
      localStorage and are never read or changed here. */
-const CACHE_NAME = 'ppm-v39-rev-au';
+const CACHE_NAME = 'ppm-v39-rev-av';
 const SHELL = 'index.html';
 const OPTIONAL = ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 const NETWORK_WAIT_MS = 3000;
