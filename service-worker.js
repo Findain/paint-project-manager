@@ -6,18 +6,15 @@
    - Update-check and refresh requests are never saved (they would fill storage).
    - Only this worker touches Cache Storage. Walks, orders and settings live in
      localStorage and are never read or changed here. */
-const CACHE_NAME = 'ppm-v40-rev-ab';
+const CACHE_NAME = 'ppm-v40-rev-ac';
 const SHELL = 'index.html';
-const OPTIONAL = [
-  'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png',
-  'seasonal-engine.js',
-  'theme-assets/fall/splash-desktop.webp', 'theme-assets/fall/splash-mobile.webp',
-  'theme-assets/fall/home-desktop.webp', 'theme-assets/fall/home-mobile.webp',
-  'theme-assets/thanksgiving/splash-desktop.webp', 'theme-assets/thanksgiving/splash-mobile.webp',
-  'theme-assets/thanksgiving/home-desktop.webp', 'theme-assets/thanksgiving/home-mobile.webp'
-];
+const OPTIONAL = ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png',
+  'assets/seasons/fall-home.webp',
+  'assets/seasons/thanksgiving-splash-desktop.webp', 'assets/seasons/thanksgiving-splash-mobile.webp',
+  'assets/seasons/thanksgiving-home-desktop.webp', 'assets/seasons/thanksgiving-home-mobile.webp',
+  'assets/seasons/christmas-home.webp', 'assets/seasons/winter-home.webp', 'assets/seasons/stpatrick-home.webp'];
 const NETWORK_WAIT_MS = 3000;
-const CACHEABLE = /\.(?:png|jpe?g|webp|svg|ico|webmanifest|json|js|css)$/i;
+const CACHEABLE = /\.(?:png|jpe?g|webp|svg|ico|webmanifest|json)$/i;
 const scoped = path => new URL(path, self.registration.scope).href;
 self.addEventListener('install', event => {
   event.waitUntil((async () => {

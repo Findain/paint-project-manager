@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'self'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>Review and sign</title>
+<style>
+:root{--bg:#fffaf5;--card:#ffffff;--ink:#1d2733;--muted:#5b6470;--line:#e3d3c0;--brand:#8a4b12;--brand-ink:#ffffff;--ok:#1b6b3a;--bad:#a12a1a;--warn-bg:#fff3e0;--warn-ink:#7a3e00;--field:#ffffff;--head:#f6eee3}
+@media (prefers-color-scheme:dark){:root{--bg:#14110e;--card:#201b16;--ink:#f3ece4;--muted:#b9aea2;--line:#4a3d30;--brand:#e8a252;--brand-ink:#1b1209;--ok:#6fd39a;--bad:#ff9d8f;--warn-bg:#3a2a14;--warn-ink:#ffd9a3;--field:#14110e;--head:#2a231c}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;padding:max(14px,env(safe-area-inset-top)) 14px max(28px,env(safe-area-inset-bottom))}
+main{max-width:680px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+h1{font-size:22px;line-height:1.2;margin:0 0 4px;word-break:break-word}
+h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+h3{font-size:16px;margin:14px 0 6px}
+p{margin:8px 0}
+.muted{color:var(--muted);font-size:14px}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:10px;font-size:14px}
+.meta div span{display:block;color:var(--muted);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
+.meta div b{word-break:break-word}
+@media (max-width:420px){.meta{grid-template-columns:1fr}}
+table{width:100%;border-collapse:collapse;margin:6px 0 2px;font-size:14px}
+th{background:var(--head);text-align:left;padding:7px 8px;font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n,th.n{text-align:right;white-space:nowrap}
+td small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.tot{margin-top:10px;margin-left:auto;max-width:320px}
+.tot div{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:15px}
+.tot .grand{border-top:2px solid var(--ink);margin-top:4px;padding-top:7px;font-size:18px;font-weight:800}
+ul.scope{margin:6px 0 6px 18px;padding:0}
+ul.scope li{margin:2px 0}
+.opt{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0}
+.opt label{display:flex;gap:10px;align-items:flex-start;font-weight:800;cursor:pointer}
+.opt input{margin-top:4px;width:20px;height:20px}
+label.f{display:block;margin:14px 0 6px;font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+input[type=text]{width:100%;padding:12px;font:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:12px}
+textarea{width:100%;min-height:110px;padding:12px;font:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:12px;resize:vertical}
+textarea:focus-visible,input[type=text]:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.agree{display:flex;gap:12px;align-items:flex-start;margin:14px 0;font-weight:700}
+.agree input{margin-top:3px;width:22px;height:22px;flex:none}
+.say{padding:12px;border-radius:12px;background:var(--head);border:1px solid var(--line);font-size:15px}
+.padwrap{border:2px dashed var(--line);border-radius:12px;background:#ffffff;touch-action:none;overflow:hidden}
+canvas{display:block;width:100%;height:auto;touch-action:none;cursor:crosshair}
+button.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;padding:12px 16px;border-radius:14px;border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);font:inherit;font-weight:800;font-size:17px;cursor:pointer}
+a.btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:54px;padding:12px 16px;border-radius:14px;border:1px solid var(--brand);background:var(--brand);color:var(--brand-ink);font:inherit;font-weight:800;font-size:17px;text-decoration:none;text-align:center}
+a.btn.alt{background:transparent;color:var(--ink);border-color:var(--line);min-height:46px;font-size:15px;margin-top:8px}
+a.btn:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+button.btn.alt{background:transparent;color:var(--ink);border-color:var(--line);min-height:46px;font-size:15px;margin-top:8px}
+button.btn:disabled{opacity:.6;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.err{min-height:22px;margin:10px 0 0;color:var(--bad);font-weight:800}
+.big{font-size:20px;font-weight:800}
+.ok{color:var(--ok)}
+.warn{margin-top:12px;padding:10px 12px;border-radius:12px;background:var(--warn-bg);color:var(--warn-ink);font-size:14px}
+.photo{max-width:100%}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <div id="app" aria-live="polite"><div class="card"><p class="muted">Loading your quote…</p></div></div>
+</main>
+<noscript><main><div class="card"><h1>Review and sign</h1><p>This page needs JavaScript to show the quote and take your signature. Please contact the business using the details on your quote instead.</p></div></main></noscript>
+<script>
+(function () {
+  'use strict';
+  /* Online signing page for Paint Project Manager quotes.
+     The secret in the web address (after the "#") is never sent to a server by the browser; the page sends it once, inside a
+     request, to read the quote and to send the signature back. No scripts, fonts, images, analytics or cookies are loaded
+     from anywhere else. */
+  var app = document.getElementById('app');
+  var t = (new URLSearchParams((location.hash || '').replace(/^#/, '')).get('t') || '').toLowerCase();
+  window.addEventListener('hashchange', function () { location.reload(); });
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function money(c) { var n = Math.round(Number(c) || 0), neg = n < 0; n = Math.abs(n); var d = Math.floor(n / 100), cents = n % 100; return (neg ? '-' : '') + '$' + String(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + (cents < 10 ? '0' : '') + cents; }
+  function when(ms) { try { return new Date(ms).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } }
+  function dateOnly(ms) { try { return new Date(ms).toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' }); } catch (e) { return ''; } }
+  function str(v, n) { return String(v == null ? '' : v).slice(0, n); }
+  function clear() { while (app.firstChild) app.removeChild(app.firstChild); }
+  function post(action, payload) {
+    return fetch('./index.php?a=' + action, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      .then(function (r) { return r.text().then(function (txt) { var j = null; try { j = JSON.parse(txt); } catch (e) { } return j || { ok: false, error: 'The signing service did not answer correctly. Please try again in a moment.' }; }); })
+      .catch(function () { return { ok: false, error: 'Could not reach the signing service. Check your connection and try again.' }; });
+  }
+  function contactLines(c) {
+    var d = el('div', 'muted');
+    var bits = []; if (c && c.name) bits.push(c.name); if (c && c.phone) bits.push(c.phone); if (c && c.email) bits.push(c.email);
+    d.textContent = bits.length ? 'Contact: ' + bits.join(' | ') : 'Please contact the business using the details on your quote.';
+    return d;
+  }
+  function lbl(kind) { return kind === 'invoice' ? 'Invoice' : 'Quote'; }
+  /* A payment link is only ever shown as a button when it is a plain web address. */
+  function payCard(pay, money2) {
+    if (!pay || !/^https?:\/\/[\x21-\x7e]{4,190}$/i.test(String(pay.link || ''))) return null;
+    var card = el('div', 'card'); card.appendChild(el('h2', '', 'Pay now'));
+    if (money2) card.appendChild(el('p', 'big', money2));
+    if (pay.text) { var p = el('p'); p.style.whiteSpace = 'pre-wrap'; p.textContent = str(pay.text, 300); card.appendChild(p); }
+    var a = el('a', 'btn', 'Pay now'); a.href = pay.link; a.target = '_blank'; a.rel = 'noopener noreferrer'; card.appendChild(a);
+    card.appendChild(el('p', 'muted', 'This opens the payment page the business gave for this invoice.'));
+    return card;
+  }
+  function message(title, text, c, cls, pay) {
+    clear(); var card = el('div', 'card'); card.appendChild(el('h1', cls || '', title)); card.appendChild(el('p', '', text)); if (c) card.appendChild(contactLines(c)); app.appendChild(card);
+    var pc = payCard(pay); if (pc) app.appendChild(pc);
+  }
+
+  if (!/^[a-f0-9]{64}$/.test(t)) { message('This signing link is incomplete', 'Open the PDF again and tap the REVIEW & SIGN ONLINE button. Some apps shorten links when you share them.', null); return; }
+
+  post('sign_get', { t: t }).then(function (r) {
+    if (!r.ok) { message('Something went wrong', r.error || 'Please try again in a moment.', null); return; }
+    if (r.state === 'missing') { message('This signing link is not available', 'It may have been replaced by a newer version, or the job may be finished. Please contact the business for a new link.', null); return; }
+    if (r.state === 'signed') { message('Already signed', lbl(r.kind) + ' ' + str(r.number, 30) + ' was signed by ' + str(r.name, 80) + (r.at ? ' on ' + when(r.at) : '') + '. Nothing more is needed.', r.contact, 'ok', r.pay); return; }
+    if (r.state === 'expired') { message('This signing link has expired', lbl(r.kind) + ' ' + str(r.number, 30) + (r.expired_at ? ' was open until ' + dateOnly(r.expired_at) : ' is no longer open') + '. Please ask the business for a new ' + lbl(r.kind).toLowerCase() + '.', r.contact, '', r.pay); return; }
+    if (r.state !== 'open' || !r.snapshot) { message('Something went wrong', 'Please try again in a moment.', null); return; }
+    show(r);
+  });
+
+  function rowsTable(sections) {
+    var frag = document.createDocumentFragment();
+    (sections || []).forEach(function (s) {
+      var rows = (s.rows || []).filter(function (r) { return r && (r.d || r.a); }); if (!rows.length) return;
+      frag.appendChild(el('h3', '', str(s.title, 60)));
+      var tb = el('table'); var th = el('thead'), trh = el('tr');
+      ['Item', 'Qty', 'Price', 'Amount'].forEach(function (h, i) { var c = el('th', i ? 'n' : '', h); trh.appendChild(c); }); th.appendChild(trh); tb.appendChild(th);
+      var body = el('tbody');
+      rows.forEach(function (r) {
+        var tr = el('tr'); var c1 = el('td'); c1.appendChild(document.createTextNode(str(r.d, 160))); if (r.x) c1.appendChild(el('small', '', str(r.x, 240))); tr.appendChild(c1);
+        tr.appendChild(el('td', 'n', str(r.q, 12))); tr.appendChild(el('td', 'n', str(r.u, 20))); tr.appendChild(el('td', 'n', money(r.a))); body.appendChild(tr);
+      });
+      tb.appendChild(body); frag.appendChild(tb);
+    });
+    return frag;
+  }
+  function totalsBox(tt, balance) {
+    var box = el('div', 'tot'); if (!tt) return box;
+    function line(l, c, cls) { var d = el('div', cls || ''); d.appendChild(el('span', '', str(l, 60))); d.appendChild(el('b', '', money(c))); box.appendChild(d); }
+    (tt.sub || []).forEach(function (s) { if (s && Number(s.cents) > 0) line(s.label, s.cents); });
+    if (tt.discount && Number(tt.discount.cents) > 0) line(tt.discount.label || 'Discount', -tt.discount.cents);
+    if (tt.tax && Number(tt.tax.cents) > 0) line(tt.tax.label || 'Tax', tt.tax.cents);
+    line('Total', tt.total, 'grand');
+    (tt.rows || []).forEach(function (x) { if (x && (Number(x.cents) > 0 || (balance != null && Number(x.cents) < 0))) line(x.label, x.cents); });
+    if (balance != null) line('Balance due', balance, 'grand');
+    return box;
+  }
+
+  function show(r) {
+    var s = r.snapshot, nOpt = Math.max(1, Math.min(3, r.options | 0)), totals = r.totals || [], isInv = s.kind === 'invoice', L = isInv ? 'Invoice' : 'Quote';
+    clear();
+    var head = el('div', 'card');
+    head.appendChild(el('h2', '', L + ' ' + str(s.number, 30)));
+    head.appendChild(el('h1', '', str(s.biz && s.biz.name, 80) || ('Your ' + L.toLowerCase())));
+    var meta = el('div', 'meta');
+    function m(label, val) { if (!val) return; var d = el('div'); d.appendChild(el('span', '', label)); d.appendChild(el('b', '', str(val, 200))); meta.appendChild(d); }
+    m(isInv ? 'Billed to' : 'Prepared for', s.customer && s.customer.name); m('Date', s.date); m('Job', s.job && s.job.label); m('Address', s.job && s.job.address);
+    if (isInv) m('Due', s.due); else m('Open until', r.expires_at ? dateOnly(r.expires_at) : (s.validUntil || ''));
+    head.appendChild(meta);
+    var contact = []; if (s.biz && s.biz.phone) contact.push(s.biz.phone); if (s.biz && s.biz.email) contact.push(s.biz.email); if (s.biz && s.biz.license) contact.push('License ' + s.biz.license);
+    if (contact.length) head.appendChild(el('p', 'muted', contact.join(' | ')));
+    app.appendChild(head);
+
+    if (s.scope && ((s.scope.areas || []).length || (s.scope.items || []).length || s.scope.extra)) {
+      var sc = el('div', 'card'); sc.appendChild(el('h2', '', 'Scope of work'));
+      if ((s.scope.areas || []).length) { sc.appendChild(el('h3', '', 'Areas and surfaces')); var u1 = el('ul', 'scope'); s.scope.areas.forEach(function (a) { u1.appendChild(el('li', '', str(a, 300))); }); sc.appendChild(u1); }
+      if ((s.scope.items || []).length) { sc.appendChild(el('h3', '', 'Prep and protection included')); var u2 = el('ul', 'scope'); s.scope.items.forEach(function (a) { u2.appendChild(el('li', '', str(a, 200))); }); sc.appendChild(u2); }
+      if (s.scope.extra) { sc.appendChild(el('h3', '', 'Other notes')); sc.appendChild(el('p', '', str(s.scope.extra, 400))); }
+      app.appendChild(sc);
+    }
+
+    var pricing = el('div', 'card'); pricing.appendChild(el('h2', '', nOpt > 1 ? 'Your options' : 'Pricing'));
+    var radios = [];
+    if (nOpt > 1 && s.options) {
+      s.options.slice(0, nOpt).forEach(function (o, i) {
+        var box = el('div', 'opt'); var lab = el('label'); var inp = el('input'); inp.type = 'radio'; inp.name = 'opt'; inp.value = String(i); radios.push(inp); lab.appendChild(inp);
+        lab.appendChild(document.createTextNode('Option ' + String.fromCharCode(65 + i) + (o.name ? ' (' + str(o.name, 24) + ')' : '') + ' - ' + money(totals[i])));
+        box.appendChild(lab); box.appendChild(rowsTable(o.sections)); box.appendChild(totalsBox(o.totals)); pricing.appendChild(box);
+      });
+    } else { pricing.appendChild(rowsTable(s.sections)); pricing.appendChild(totalsBox(s.totals, isInv ? (Number(s.balance) || 0) : null)); }
+    app.appendChild(pricing);
+    if (isInv) { var pcOpen = payCard(s.pay, (Number(s.balance) || 0) > 0 ? money(s.balance) : ''); if (pcOpen) app.appendChild(pcOpen); }
+
+    var notes = (s.notes || []).map(function (x) { return str(x, 800).trim(); }).filter(Boolean);
+    if (notes.length) { var nc = el('div', 'card'); nc.appendChild(el('h2', '', 'Notes')); notes.forEach(function (x) { var p = el('p'); p.style.whiteSpace = 'pre-wrap'; p.textContent = x; nc.appendChild(p); }); app.appendChild(nc); }
+
+    /* ---- the signing card ---- */
+    var sg = el('div', 'card'); sg.appendChild(el('h2', '', isInv ? 'Sign to approve' : 'Sign to accept'));
+    var say = el('p', 'say'); sg.appendChild(say);
+    var agreeBase = str(s.agreement, 300).trim() || 'I agree to the work and charges described in this document.';
+    function chosen() { if (nOpt <= 1) return 0; for (var i = 0; i < radios.length; i++) if (radios[i].checked) return i; return -1; }
+    function agreementText() {
+      var i = chosen(), opt = '';
+      if (nOpt > 1) { if (i < 0) return 'Choose an option above, then read and sign here.'; var o = (s.options || [])[i] || {}; opt = ' for option ' + String.fromCharCode(65 + i) + (o.name ? ' (' + str(o.name, 24) + ')' : ''); }
+      return (agreeBase + ' ' + L + ' ' + str(s.number, 30) + opt + ', total ' + money(totals[nOpt > 1 ? i : 0]) + '.').replace(/\s+/g, ' ').trim();
+    }
+    function paintSay() { say.textContent = agreementText(); }
+    radios.forEach(function (rd) { rd.addEventListener('change', paintSay); }); paintSay();
+
+    var lbA = el('label', 'agree'); var cb = el('input'); cb.type = 'checkbox'; cb.id = 'agree'; lbA.appendChild(cb); lbA.appendChild(el('span', '', 'I have read this and I agree')); sg.appendChild(lbA);
+    var ln = el('label', 'f', 'Printed name *'); ln.setAttribute('for', 'nm'); sg.appendChild(ln);
+    var nm = el('input'); nm.type = 'text'; nm.id = 'nm'; nm.maxLength = 80; nm.autocomplete = 'name'; nm.value = str(s.customer && s.customer.name, 80); sg.appendChild(nm);
+    var ls = el('label', 'f', 'Signature *'); ls.setAttribute('for', 'pad'); sg.appendChild(ls);
+    var pw = el('div', 'padwrap'); var cv = el('canvas'); cv.id = 'pad'; cv.width = 640; cv.height = 220; cv.setAttribute('role', 'img'); cv.setAttribute('aria-label', 'Signature area. Draw with a finger or mouse.'); pw.appendChild(cv); sg.appendChild(pw);
+    var er = el('p', 'err'); er.setAttribute('role', 'alert'); sg.appendChild(er);
+    var go = el('button', 'btn', isInv ? 'Sign and approve' : 'Sign and accept'); go.type = 'button'; sg.appendChild(go);
+    var cl = el('button', 'btn alt', 'Clear signature'); cl.type = 'button'; sg.appendChild(cl);
+    sg.appendChild(el('div', 'warn', 'Your signature and typed name are sent to the business that gave you this ' + L.toLowerCase() + '. This is a record of your agreement. It is not a certified e-signature service.'));
+    app.appendChild(sg);
+
+    /* Rev CE: Question / Decline go straight to the business through the developer's server. The text and email links stay as a back-up. */
+    var canMsg = s.rf === 1 || s.rf === true;
+    var fall = [];
+    if (Array.isArray(s.reply)) s.reply.slice(0, 2).forEach(function (rr) { var h = String(rr && rr.h || ''); if (/^[\x21-\x7e]{1,2600}$/.test(h)) fall.push({ t: str(rr.t, 40), h: h }); });
+    if (canMsg || fall.length) {
+      var msgCard = el('div', 'card'), bizName = str(s.biz && s.biz.name, 80) || 'the business';
+      msgCard.appendChild(el('h2', '', isInv ? 'Have a question?' : 'Questions or changes?'));
+      if (canMsg) {
+        msgCard.appendChild(el('p', '', 'You do not have to sign yet. Send your message straight to ' + bizName + ' from this page.'));
+        var lMsg = el('label', 'f', 'Your message'); lMsg.setAttribute('for', 'msgText'); msgCard.appendChild(lMsg);
+        var msgText = el('textarea'); msgText.id = 'msgText'; msgText.maxLength = 800; msgText.rows = 4; msgText.autocomplete = 'off'; msgCard.appendChild(msgText);
+        var lMn = el('label', 'f', 'Your name'); lMn.setAttribute('for', 'msgName'); msgCard.appendChild(lMn);
+        var msgName = el('input'); msgName.type = 'text'; msgName.id = 'msgName'; msgName.maxLength = 80; msgName.autocomplete = 'name'; msgName.value = str(s.customer && s.customer.name, 80); msgCard.appendChild(msgName);
+        var lMc = el('label', 'f', 'Best phone or email to reach you (optional)'); lMc.setAttribute('for', 'msgContact'); msgCard.appendChild(lMc);
+        var msgContact = el('input'); msgContact.type = 'text'; msgContact.id = 'msgContact'; msgContact.maxLength = 120; msgContact.autocomplete = 'off'; msgCard.appendChild(msgContact);
+        var msgErr = el('p', 'err'); msgErr.setAttribute('role', 'alert'); msgCard.appendChild(msgErr);
+        var msgOk = el('p', 'ok'); msgOk.setAttribute('role', 'status'); msgCard.appendChild(msgOk);
+        var msgSend = el('button', 'btn', isInv ? 'Send my question' : 'Send my question or changes'); msgSend.type = 'button'; msgCard.appendChild(msgSend);
+        var msgDecl = null, declArmed = false, declTimer = null, declLabel = 'Decline this quote';
+        if (!isInv) { msgDecl = el('button', 'btn alt', declLabel); msgDecl.type = 'button'; msgCard.appendChild(msgDecl); }
+        msgCard.appendChild(el('div', 'warn', "Your message, name and contact detail are sent to the business through the developer's server. Do not type anything private here."));
+        function declReset() { declArmed = false; if (declTimer) { clearTimeout(declTimer); declTimer = null; } if (msgDecl) msgDecl.textContent = declLabel; }
+        function sendMsg(kind) {
+          var msg = msgText.value.replace(/\r\n?/g, '\n').trim(), who = msgName.value.replace(/\s+/g, ' ').trim(), how = msgContact.value.replace(/\s+/g, ' ').trim();
+          msgOk.textContent = '';
+          if (kind === 'question' && msg.length < 2) { msgErr.textContent = 'Type your question or the changes you want.'; msgText.focus(); return; }
+          msgErr.textContent = ''; msgSend.disabled = true; if (msgDecl) msgDecl.disabled = true;
+          post('sign_reply', { t: t, kind: kind, message: msg, name: who, contact: how }).then(function (res) {
+            msgSend.disabled = false; if (msgDecl) msgDecl.disabled = false; declReset();
+            if (!res.ok) { msgErr.textContent = res.error || 'Your message could not be sent. Please try again.'; return; }
+            if (kind === 'decline') {
+              clear(); var gone = el('div', 'card');
+              gone.appendChild(el('h1', 'ok', 'Thank you. Your answer was sent.'));
+              gone.appendChild(el('p', '', bizName + ' will get your answer and can contact you if needed.'));
+              gone.appendChild(contactLines(res.contact || { name: s.biz && s.biz.name, phone: s.biz && s.biz.phone, email: s.biz && s.biz.email }));
+              app.appendChild(gone); try { window.scrollTo(0, 0); } catch (e) { }
+              return;
+            }
+            msgText.value = '';
+            msgOk.textContent = 'Sent. ' + bizName + ' will get your message. You can still sign above whenever you are ready.';
+          });
+        }
+        msgSend.addEventListener('click', function () { sendMsg('question'); });
+        if (msgDecl) msgDecl.addEventListener('click', function () {
+          if (!declArmed) { declArmed = true; msgDecl.textContent = 'Tap again to confirm: decline this quote'; declTimer = setTimeout(declReset, 6000); return; }
+          declReset(); sendMsg('decline');
+        });
+      }
+      var fb = canMsg ? fall.slice(0, 1) : fall, baseUrl = '';
+      try { baseUrl = new URL('reply.html', location.href).href; } catch (e) { baseUrl = ''; }
+      if (fb.length && baseUrl) {
+        msgCard.appendChild(el('p', 'muted', canMsg ? 'Prefer to use your own text or email app?' : 'Tap a button. A short reply page opens, where you choose text or email from your own phone. Nothing is sent until you press Send there.'));
+        fb.forEach(function (rr) { var ra = el('a', 'btn alt', canMsg ? 'Reply by text or email' : rr.t); ra.href = baseUrl + '#' + rr.h; ra.target = '_blank'; ra.rel = 'noopener noreferrer'; msgCard.appendChild(ra); });
+      }
+      if (canMsg || (fb.length && baseUrl)) app.appendChild(msgCard);
+    }
+
+    /* the pad matches the one in the app: white page, black ink, cropped to the ink, small JPEG */
+    var g = cv.getContext('2d'), drawing = false, last = null, ink = 0, minX = 1e9, maxX = -1, minY = 1e9, maxY = -1;
+    function wipe() { g.fillStyle = '#ffffff'; g.fillRect(0, 0, cv.width, cv.height); g.strokeStyle = '#111111'; g.lineWidth = 3.2; g.lineCap = 'round'; g.lineJoin = 'round'; ink = 0; minX = 1e9; maxX = -1; minY = 1e9; maxY = -1; }
+    function grow(p) { minX = Math.min(minX, p.x); maxX = Math.max(maxX, p.x); minY = Math.min(minY, p.y); maxY = Math.max(maxY, p.y); }
+    function cropped() {
+      var x0 = Math.max(0, Math.floor(minX - 14)), y0 = Math.max(0, Math.floor(minY - 14)), x1 = Math.min(cv.width, Math.ceil(maxX + 14)), y1 = Math.min(cv.height, Math.ceil(maxY + 14));
+      var w = Math.max(120, x1 - x0), h = Math.max(48, y1 - y0); if (x0 + w > cv.width) x0 = Math.max(0, cv.width - w); if (y0 + h > cv.height) y0 = Math.max(0, cv.height - h);
+      w = Math.min(w, cv.width - x0); h = Math.min(h, cv.height - y0);
+      var sc = Math.min(1, 360 / w), c2 = document.createElement('canvas'); c2.width = Math.max(1, Math.round(w * sc)); c2.height = Math.max(1, Math.round(h * sc));
+      var g2 = c2.getContext('2d'); g2.fillStyle = '#ffffff'; g2.fillRect(0, 0, c2.width, c2.height); g2.drawImage(cv, x0, y0, w, h, 0, 0, c2.width, c2.height);
+      return { url: c2.toDataURL('image/jpeg', 0.72), w: c2.width, h: c2.height };
+    }
+    wipe();
+    function pt(e) { var rc = cv.getBoundingClientRect(); return { x: (e.clientX - rc.left) * cv.width / rc.width, y: (e.clientY - rc.top) * cv.height / rc.height }; }
+    cv.addEventListener('pointerdown', function (e) { e.preventDefault(); er.textContent = ''; drawing = true; last = pt(e); try { cv.setPointerCapture(e.pointerId); } catch (x) { } g.beginPath(); g.arc(last.x, last.y, 1.6, 0, 6.3); g.fillStyle = '#111111'; g.fill(); ink += 2; grow(last); });
+    cv.addEventListener('pointermove', function (e) { if (!drawing) return; e.preventDefault(); var p = pt(e); g.beginPath(); g.moveTo(last.x, last.y); g.lineTo(p.x, p.y); g.stroke(); ink += Math.abs(p.x - last.x) + Math.abs(p.y - last.y); grow(p); last = p; });
+    function up() { drawing = false; last = null; }
+    cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up); cv.addEventListener('pointerleave', up);
+    cl.addEventListener('click', function () { wipe(); er.textContent = ''; });
+
+    go.addEventListener('click', function () {
+      var i = chosen(), name = nm.value.replace(/\s+/g, ' ').trim();
+      if (nOpt > 1 && i < 0) { er.textContent = 'Choose which option you are signing for.'; return; }
+      if (!cb.checked) { er.textContent = 'Check the box to confirm you agree.'; return; }
+      if (!name) { er.textContent = 'Type your printed name.'; nm.focus(); return; }
+      if (ink < 60 || (maxX - minX) < 40) { er.textContent = 'Please sign in the box with your finger or mouse.'; return; }
+      var c = cropped(); if (!/^data:image\/jpeg;base64,/.test(c.url)) { er.textContent = 'Your signature could not be saved. Please try again.'; return; }
+      er.textContent = ''; go.disabled = true; var old = go.textContent; go.textContent = 'Sending…';
+      post('sign_submit', { t: t, name: name, agree: true, img: c.url, w: c.w, h: c.h, option: nOpt > 1 ? i : -1 }).then(function (res) {
+        if (!res.ok) { go.disabled = false; go.textContent = old; er.textContent = res.error || 'Your signature could not be sent. Please try again.'; return; }
+        clear(); var card = el('div', 'card');
+        card.appendChild(el('h1', 'ok', 'Thank you. Your signature was sent.'));
+        card.appendChild(el('p', '', L + ' ' + str(res.number || s.number, 30) + ' was signed by ' + name + (res.at ? ' on ' + when(res.at) : '') + '. You do not need to do anything else.'));
+        card.appendChild(contactLines(res.contact || { name: s.biz && s.biz.name, phone: s.biz && s.biz.phone, email: s.biz && s.biz.email }));
+        app.appendChild(card);
+        if (isInv) { var pcDone = payCard(s.pay, (Number(s.balance) || 0) > 0 ? money(s.balance) : ''); if (pcDone) app.appendChild(pcDone); }
+        try { window.scrollTo(0, 0); } catch (e) { }
+      });
+    });
+  }
+})();
+</script>
+</body>
+</html>

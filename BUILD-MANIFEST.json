@@ -1,0 +1,92 @@
+{
+  "product": "Paint Project Manager",
+  "version": "V4.0 \u00b7 Rev AC",
+  "built": "2026-11-07",
+  "files": [
+    {
+      "path": "apple-touch-icon.png",
+      "bytes": 63112,
+      "sha256": "28aa3d86b5c23ac0e318603df74b9a8a789a25787467aa154038c2695cd00b67"
+    },
+    {
+      "path": "assets/seasons/christmas-home.webp",
+      "bytes": 721464,
+      "sha256": "90fafcaa4ef6c7312955054b949d2fb148bdb5a2fc83bc49d8af568264d4db9c"
+    },
+    {
+      "path": "assets/seasons/fall-home.webp",
+      "bytes": 641348,
+      "sha256": "f9f2abe2e77ba73e8ce098014740962894eebc85fa6dc12328b1f92a13c503ad"
+    },
+    {
+      "path": "assets/seasons/stpatrick-home.webp",
+      "bytes": 711698,
+      "sha256": "3fcfea7b0053d32d53c675e8d0fc54707152ca708aae0d172bac205ebb0dd0ce"
+    },
+    {
+      "path": "assets/seasons/thanksgiving-home-desktop.webp",
+      "bytes": 582402,
+      "sha256": "dbbf83c4447d64727d2630fd632fc72d485a118872a8d3ad6ae10743c62ac7f6"
+    },
+    {
+      "path": "assets/seasons/thanksgiving-home-mobile.webp",
+      "bytes": 459206,
+      "sha256": "2e31d62f8df9e57fa2ed85d05419c799f773239b4aee2ec176c010c371f0bec9"
+    },
+    {
+      "path": "assets/seasons/thanksgiving-splash-desktop.webp",
+      "bytes": 559146,
+      "sha256": "85786675d832844441634f7c4520982d468e74965aa32edb34b6d9bde5bebd7f"
+    },
+    {
+      "path": "assets/seasons/thanksgiving-splash-mobile.webp",
+      "bytes": 567738,
+      "sha256": "cc4d6cb1ca29e7b2f85f795010a3e684f661fbb3b66256f5a1190d75a2a83145"
+    },
+    {
+      "path": "assets/seasons/winter-home.webp",
+      "bytes": 695198,
+      "sha256": "bbb14de2a1de97f75a822e79143ffedbe07aa4ac58f7ba390c5daa4c8510030c"
+    },
+    {
+      "path": "icon-192.png",
+      "bytes": 70268,
+      "sha256": "172e7b6cd61529f72cde44421df9aa758c0d9beb09d6fe6fe8779ad441b5628e"
+    },
+    {
+      "path": "icon-512.png",
+      "bytes": 342726,
+      "sha256": "4f43ae2d066300fb71c5e530d28c9031499f47d544d36594ea7804c26405c8c0"
+    },
+    {
+      "path": "index.html",
+      "bytes": 1774318,
+      "sha256": "4e75edf055dfe3cbbfd2df8d4d0ee3aab3d2392bb7d347f056c824118b08bb7a"
+    },
+    {
+      "path": "index.php",
+      "bytes": 41809,
+      "sha256": "06d7602615a600e236c876ca373db627ea284e3b90f4b4c053eda55f1dfc6ed3"
+    },
+    {
+      "path": "manifest.webmanifest",
+      "bytes": 307,
+      "sha256": "dadf7f9c67e8161dc7b0d6707d34d607536147e7ec0015610c30a592b6a7ee44"
+    },
+    {
+      "path": "reply.html",
+      "bytes": 8926,
+      "sha256": "86abb2d534f8f591b04c450df1cce67f70235dfec7a13c1668d9390d6278cbf2"
+    },
+    {
+      "path": "service-worker.js",
+      "bytes": 3901,
+      "sha256": "69ad4db355cb66c0d12c0f1718f8282b3c1f5f680f34899db982619bb6477588"
+    },
+    {
+      "path": "sign.html",
+      "bytes": 27648,
+      "sha256": "f677fae1bfb4263c7ccc509628808f2c8d14b8acf524318819d21b5bb2a9c458"
+    }
+  ]
+}
