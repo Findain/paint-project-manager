@@ -11,10 +11,10 @@
     fall: {
       label: 'Fall', available: true, fallback: null,
       assets: {
-        splashDesktop: ASSET_ROOT + 'fall/splash-desktop.webp',
-        splashMobile: ASSET_ROOT + 'fall/splash-mobile.webp',
-        homeDesktop: ASSET_ROOT + 'fall/home-desktop.webp',
-        homeMobile: ASSET_ROOT + 'fall/home-mobile.webp'
+        splashDesktop: ASSET_ROOT + 'splash-desktop.webp',
+        splashMobile: ASSET_ROOT + 'splash-mobile.webp',
+        homeDesktop: ASSET_ROOT + 'home-desktop.webp',
+        homeMobile: ASSET_ROOT + 'home-mobile.webp'
       },
       home: {
         desk: {
@@ -44,10 +44,10 @@
     thanksgiving: {
       label: 'Thanksgiving', available: true, fallback: 'fall',
       assets: {
-        splashDesktop: ASSET_ROOT + 'thanksgiving/splash-desktop.webp',
-        splashMobile: ASSET_ROOT + 'thanksgiving/splash-mobile.webp',
-        homeDesktop: ASSET_ROOT + 'thanksgiving/home-desktop.webp',
-        homeMobile: ASSET_ROOT + 'thanksgiving/home-mobile.webp'
+        splashDesktop: ASSET_ROOT + 'splash-desktop.webp',
+        splashMobile: ASSET_ROOT + 'splash-mobile.webp',
+        homeDesktop: ASSET_ROOT + 'home-desktop.webp',
+        homeMobile: ASSET_ROOT + 'home-mobile.webp'
       },
       /* Approved Rev AA maps, retained without changing badge logic. */
       home: {
