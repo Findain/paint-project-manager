@@ -6,13 +6,29 @@
    - Update-check and refresh requests are never saved (they would fill storage).
    - Only this worker touches Cache Storage. Walks, orders and settings live in
      localStorage and are never read or changed here. */
-const CACHE_NAME = 'ppm-v40-rev-ac';
+const CACHE_NAME = 'ppm-v40-rev-ad';
 const SHELL = 'index.html';
 const OPTIONAL = ['manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png',
-  'assets/seasons/fall-home.webp',
-  'assets/seasons/thanksgiving-splash-desktop.webp', 'assets/seasons/thanksgiving-splash-mobile.webp',
-  'assets/seasons/thanksgiving-home-desktop.webp', 'assets/seasons/thanksgiving-home-mobile.webp',
-  'assets/seasons/christmas-home.webp', 'assets/seasons/winter-home.webp', 'assets/seasons/stpatrick-home.webp'];
+  'assets/seasons/christmas-home-desktop.webp',
+  'assets/seasons/christmas-home-mobile.webp',
+  'assets/seasons/christmas-splash-desktop.webp',
+  'assets/seasons/christmas-splash-mobile.webp',
+  'assets/seasons/fall-home-desktop.webp',
+  'assets/seasons/fall-home-mobile.webp',
+  'assets/seasons/fall-splash-desktop.webp',
+  'assets/seasons/fall-splash-mobile.webp',
+  'assets/seasons/stpatrick-home-desktop.webp',
+  'assets/seasons/stpatrick-home-mobile.webp',
+  'assets/seasons/stpatrick-splash-desktop.webp',
+  'assets/seasons/stpatrick-splash-mobile.webp',
+  'assets/seasons/thanksgiving-home-desktop.webp',
+  'assets/seasons/thanksgiving-home-mobile.webp',
+  'assets/seasons/thanksgiving-splash-desktop.webp',
+  'assets/seasons/thanksgiving-splash-mobile.webp',
+  'assets/seasons/winter-home-desktop.webp',
+  'assets/seasons/winter-home-mobile.webp',
+  'assets/seasons/winter-splash-desktop.webp',
+  'assets/seasons/winter-splash-mobile.webp'];
 const NETWORK_WAIT_MS = 3000;
 const CACHEABLE = /\.(?:png|jpe?g|webp|svg|ico|webmanifest|json)$/i;
 const scoped = path => new URL(path, self.registration.scope).href;
