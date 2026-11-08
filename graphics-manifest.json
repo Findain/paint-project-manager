@@ -1,180 +1,57 @@
 {
-  "manifestVersion": 1,
-  "application": "Paint Project Manager",
-  "build": "V4.0 Rev AL",
-  "location": "graphics-manifest.json",
-  "pathRules": {
-    "base": "assets/seasons/",
-    "resolution": "All asset paths are relative to the repository root containing index.html.",
-    "caseSensitive": true
-  },
-  "rootSupportFiles": {
-    "appShell": "index.html",
-    "serviceWorker": "service-worker.js",
-    "webAppManifest": "manifest.webmanifest",
-    "icons": [
-      "icon-192.png",
-      "icon-512.png",
-      "apple-touch-icon.png"
-    ]
-  },
+  "version": 1,
+  "layout": "flat-root",
+  "description": "Paint Project Manager seasonal graphics stored in the repository root beside index.html.",
   "themes": {
     "fall": {
-      "label": "Fall",
       "home": {
-        "desktop": {
-          "file": "fall-home-desktop.webp",
-          "path": "assets/seasons/fall-home-desktop.webp",
-          "width": 1536,
-          "height": 1024
-        },
-        "mobile": {
-          "file": "fall-home-mobile.webp",
-          "path": "assets/seasons/fall-home-mobile.webp",
-          "width": 1024,
-          "height": 1536
-        }
+        "desktop": "fall-home-desktop.webp",
+        "mobile": "fall-home-mobile.webp"
       },
       "splash": {
-        "desktop": {
-          "file": "fall-splash-desktop.webp",
-          "path": "assets/seasons/fall-splash-desktop.webp"
-        },
-        "mobile": {
-          "file": "fall-splash-mobile.webp",
-          "path": "assets/seasons/fall-splash-mobile.webp"
-        }
+        "desktop": "fall-splash-desktop.webp",
+        "mobile": "fall-splash-mobile.webp"
       }
     },
     "thanksgiving": {
-      "label": "Thanksgiving",
       "home": {
-        "desktop": {
-          "file": "thanksgiving-home-desktop.webp",
-          "path": "assets/seasons/thanksgiving-home-desktop.webp",
-          "width": 1920,
-          "height": 1080
-        },
-        "mobile": {
-          "file": "thanksgiving-home-mobile.webp",
-          "path": "assets/seasons/thanksgiving-home-mobile.webp",
-          "width": 945,
-          "height": 2048
-        }
+        "desktop": "thanksgiving-home-desktop.webp",
+        "mobile": "thanksgiving-home-mobile.webp"
       },
       "splash": {
-        "desktop": {
-          "file": "thanksgiving-splash-desktop.webp",
-          "path": "assets/seasons/thanksgiving-splash-desktop.webp"
-        },
-        "mobile": {
-          "file": "thanksgiving-splash-mobile.webp",
-          "path": "assets/seasons/thanksgiving-splash-mobile.webp"
-        }
+        "desktop": "thanksgiving-splash-desktop.webp",
+        "mobile": "thanksgiving-splash-mobile.webp"
       }
     },
     "christmas": {
-      "label": "Christmas",
       "home": {
-        "desktop": {
-          "file": "christmas-home-desktop.webp",
-          "path": "assets/seasons/christmas-home-desktop.webp",
-          "width": 1536,
-          "height": 1024
-        },
-        "mobile": {
-          "file": "christmas-home-mobile.webp",
-          "path": "assets/seasons/christmas-home-mobile.webp",
-          "width": 1024,
-          "height": 1536
-        }
+        "desktop": "christmas-home-desktop.webp",
+        "mobile": "christmas-home-mobile.webp"
       },
       "splash": {
-        "desktop": {
-          "file": "christmas-splash-desktop.webp",
-          "path": "assets/seasons/christmas-splash-desktop.webp"
-        },
-        "mobile": {
-          "file": "christmas-splash-mobile.webp",
-          "path": "assets/seasons/christmas-splash-mobile.webp"
-        }
+        "desktop": "christmas-splash-desktop.webp",
+        "mobile": "christmas-splash-mobile.webp"
       }
     },
     "winter": {
-      "label": "Winter",
       "home": {
-        "desktop": {
-          "file": "winter-home-desktop.webp",
-          "path": "assets/seasons/winter-home-desktop.webp",
-          "width": 1536,
-          "height": 1024
-        },
-        "mobile": {
-          "file": "winter-home-mobile.webp",
-          "path": "assets/seasons/winter-home-mobile.webp",
-          "width": 1024,
-          "height": 1536
-        }
+        "desktop": "winter-home-desktop.webp",
+        "mobile": "winter-home-mobile.webp"
       },
       "splash": {
-        "desktop": {
-          "file": "winter-splash-desktop.webp",
-          "path": "assets/seasons/winter-splash-desktop.webp"
-        },
-        "mobile": {
-          "file": "winter-splash-mobile.webp",
-          "path": "assets/seasons/winter-splash-mobile.webp"
-        }
+        "desktop": "winter-splash-desktop.webp",
+        "mobile": "winter-splash-mobile.webp"
       }
     },
     "stpatrick": {
-      "label": "St. Patrick's Day",
       "home": {
-        "desktop": {
-          "file": "stpatrick-home-desktop.webp",
-          "path": "assets/seasons/stpatrick-home-desktop.webp",
-          "width": 1536,
-          "height": 1024
-        },
-        "mobile": {
-          "file": "stpatrick-home-mobile.webp",
-          "path": "assets/seasons/stpatrick-home-mobile.webp",
-          "width": 1024,
-          "height": 1536
-        }
+        "desktop": "stpatrick-home-desktop.webp",
+        "mobile": "stpatrick-home-mobile.webp"
       },
       "splash": {
-        "desktop": {
-          "file": "stpatrick-splash-desktop.webp",
-          "path": "assets/seasons/stpatrick-splash-desktop.webp"
-        },
-        "mobile": {
-          "file": "stpatrick-splash-mobile.webp",
-          "path": "assets/seasons/stpatrick-splash-mobile.webp"
-        }
+        "desktop": "stpatrick-splash-desktop.webp",
+        "mobile": "stpatrick-splash-mobile.webp"
       }
     }
-  },
-  "precache": [
-    "assets/seasons/fall-home-desktop.webp",
-    "assets/seasons/fall-home-mobile.webp",
-    "assets/seasons/fall-splash-desktop.webp",
-    "assets/seasons/fall-splash-mobile.webp",
-    "assets/seasons/thanksgiving-home-desktop.webp",
-    "assets/seasons/thanksgiving-home-mobile.webp",
-    "assets/seasons/thanksgiving-splash-desktop.webp",
-    "assets/seasons/thanksgiving-splash-mobile.webp",
-    "assets/seasons/christmas-home-desktop.webp",
-    "assets/seasons/christmas-home-mobile.webp",
-    "assets/seasons/christmas-splash-desktop.webp",
-    "assets/seasons/christmas-splash-mobile.webp",
-    "assets/seasons/winter-home-desktop.webp",
-    "assets/seasons/winter-home-mobile.webp",
-    "assets/seasons/winter-splash-desktop.webp",
-    "assets/seasons/winter-splash-mobile.webp",
-    "assets/seasons/stpatrick-home-desktop.webp",
-    "assets/seasons/stpatrick-home-mobile.webp",
-    "assets/seasons/stpatrick-splash-desktop.webp",
-    "assets/seasons/stpatrick-splash-mobile.webp"
-  ]
+  }
 }
